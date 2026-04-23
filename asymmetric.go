@@ -89,7 +89,19 @@ func (a *Asymmetric) Sign(data []byte, hash ...crypto.Hash) ([]byte, error) {
 	return a.algorithm.Sign(privKey, data, hash...)
 }
 
-// Verify 进行验签逻辑
+func (a *Asymmetric) SignAndErase(data []byte, hash ...crypto.Hash) ([]byte, error) {
+	defer safe.ZeroMemory(data)
+	return a.Sign(data, hash...)
+}
+
+func (a *Asymmetric) MustSign(data []byte, hash ...crypto.Hash) []byte {
+	signature, err := a.Sign(data, hash...)
+	if err != nil {
+		return []byte{}
+	}
+	return signature
+}
+
 func (a *Asymmetric) Verify(data []byte, signature []byte, hash ...crypto.Hash) (bool, error) {
 	if a.pubCache != nil {
 		return a.algorithm.Verify(a.pubCache, data, signature, hash...)
@@ -106,8 +118,27 @@ func (a *Asymmetric) Verify(data []byte, signature []byte, hash ...crypto.Hash) 
 	return a.algorithm.Verify(pubKey, data, signature, hash...)
 }
 
+func (a *Asymmetric) MustVerify(data []byte, signature []byte, hash ...crypto.Hash) bool {
+	valid, err := a.Verify(data, signature, hash...)
+	if err != nil {
+		return false
+	}
+	return valid
+}
+
+func (a *Asymmetric) Encrypt(safeBuf *safe.SafeBuf) ([]byte, error) {
+	buf := safeBuf.Open()
+	defer buf.Close()
+	return a.EncryptBytes(buf.Data)
+}
+
+func (a *Asymmetric) EncryptAndErase(data []byte) ([]byte, error) {
+	defer safe.ZeroMemory(data)
+	return a.EncryptBytes(data)
+}
+
 // Encrypt 使用公钥进行非对称加密
-func (a *Asymmetric) Encrypt(data []byte) ([]byte, error) {
+func (a *Asymmetric) EncryptBytes(data []byte) ([]byte, error) {
 	cipherAlgo, ok := a.algorithm.(AsymmetricCipherAlgorithm)
 	if !ok {
 		return nil, ErrAlgorithmNoEncrypt
@@ -127,8 +158,23 @@ func (a *Asymmetric) Encrypt(data []byte) ([]byte, error) {
 	return cipherAlgo.Encrypt(pubKey, data)
 }
 
-// Decrypt 使用私钥进行非对称解密
-func (a *Asymmetric) Decrypt(data []byte) ([]byte, error) {
+func (a *Asymmetric) MustEncrypt(data []byte) []byte {
+	enc, err := a.EncryptBytes(data)
+	if err != nil {
+		return []byte{}
+	}
+	return enc
+}
+
+func (a *Asymmetric) Decrypt(data []byte) (*safe.SafeBuf, error) {
+	buf, err := a.DecryptBytes(data)
+	if err != nil {
+		return nil, err
+	}
+	return safe.NewSafeBuf(buf), nil
+}
+
+func (a *Asymmetric) DecryptBytes(data []byte) ([]byte, error) {
 	cipherAlgo, ok := a.algorithm.(AsymmetricCipherAlgorithm)
 	if !ok {
 		return nil, ErrAlgorithmNoDecrypt
@@ -146,4 +192,20 @@ func (a *Asymmetric) Decrypt(data []byte) ([]byte, error) {
 		return nil, err
 	}
 	return cipherAlgo.Decrypt(privKey, data)
+}
+
+func (a *Asymmetric) MustDecrypt(data []byte) []byte {
+	dec, err := a.DecryptBytes(data)
+	if err != nil {
+		return []byte{}
+	}
+	return dec
+}
+
+func (a *Asymmetric) TryDecrypt(data []byte) []byte {
+	dec, err := a.DecryptBytes(data)
+	if err != nil {
+		return data
+	}
+	return dec
 }
