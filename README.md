@@ -17,9 +17,14 @@
 ### 对称加密 (AES-CBC/GCM)
 - `func NewAESCBCAndEraseKey(key, iv []byte) (*Symmetric, error)`
 - `func NewAESGCMAndEraseKey(key, iv []byte) (*Symmetric, error)`
+- `func (s *Symmetric) Encrypt(safeBuf *safe.SafeBuf) ([]byte, error)`
+- `func (s *Symmetric) EncryptAndErase(data []byte) ([]byte, error)`
 - `func (s *Symmetric) EncryptBytes(data []byte) ([]byte, error)`
+- `func (s *Symmetric) MustEncrypt(data []byte) []byte`
+- `func (s *Symmetric) Decrypt(data []byte) (*safe.SafeBuf, error)`
 - `func (s *Symmetric) DecryptBytes(data []byte) ([]byte, error)`
-- `func (s *Symmetric) DecryptBytesN(data []byte) []byte` (静默解密)
+- `func (s *Symmetric) MustDecrypt(data []byte) []byte`
+- `func (s *Symmetric) TryDecrypt(data []byte) []byte`
 
 ### 非对称加密 (RSA/ECDSA/Ed25519/X25519)
 - `func NewRSAndEraseKey(priv, pub []byte) (*Asymmetric, error)`
@@ -28,14 +33,21 @@
 - `func NewX25519AndEraseKey(priv, pub []byte) (*Asymmetric, error)`
 - `func NewAsymmetricWithoutEraseKey(algo, priv, pub, fastMode) (*Asymmetric, error)`
 - `func (a *Asymmetric) Sign(data []byte, hash ...crypto.Hash) ([]byte, error)`
+- `func (a *Asymmetric) SignAndErase(data []byte, hash ...crypto.Hash) ([]byte, error)`
+- `func (a *Asymmetric) MustSign(data []byte, hash ...crypto.Hash) []byte`
 - `func (a *Asymmetric) Verify(data, signature []byte, hash ...crypto.Hash) (bool, error)`
-- `func (a *Asymmetric) Encrypt(data []byte) ([]byte, error)` (混合加密)
-- `func (a *Asymmetric) Decrypt(data []byte) ([]byte, error)` (混合解密)
+- `func (a *Asymmetric) MustVerify(data, signature []byte, hash ...crypto.Hash) bool`
+- `func (a *Asymmetric) Encrypt(safeBuf *safe.SafeBuf) ([]byte, error)`
+- `func (a *Asymmetric) EncryptAndErase(data []byte) ([]byte, error)`
+- `func (a *Asymmetric) MustEncrypt(data []byte) []byte`
+- `func (a *Asymmetric) Decrypt(data []byte) (*safe.SafeBuf, error)`
+- `func (a *Asymmetric) DecryptBytes(data []byte) ([]byte, error)`
+- `func (a *Asymmetric) MustDecrypt(data []byte) []byte`
+- `func (a *Asymmetric) TryDecrypt(data []byte) []byte`
 
 ### Hash 系列 (MD5/SHA)
 - `func MD5(data ...[]byte) []byte` / `func MD5ToHex(d []byte) string`
-- `func Sha256ToHex(d []byte) string` / `func Sha256ToBase64(d []byte) string`
-- `func Sha256ToUrlBase64(d []byte) string` (新增)
+- `func Sha256ToHex(d []byte) string` / `func Sha256ToBase64(d []byte) string` / `func Sha256ToUrlBase64(d []byte) string`
 - *其他算法 (Sha1, Sha512) 均支持上述 Hex/Base64/UrlBase64 变体*
 
 ### 密钥对生成
@@ -46,6 +58,7 @@
 
 ## 🚀 FastMode 性能模式
 在高并发服务端对接场景中，内存被恶意扫描的风险极低，但 CPU 压力巨大。
+Ed25519的非FastMode模式下性能也完全无损，强烈建议优先使用该算法。
 **建议：** 使用 `NewAsymmetricWithoutEraseKey(..., true)`。
 *   **效果**：缓存解析后的密钥对象。
 *   **性能**：实测签名速度可提升数倍，相比默认模式能支持更高的 QPS。

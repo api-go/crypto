@@ -39,7 +39,7 @@ func TestSymmetricPadding(t *testing.T) {
 	// 模拟损坏密文导致填充错误
 	damaged := append([]byte(nil), enc...)
 	damaged[len(damaged)-1] ^= 0xFF
-	if d := aes.DecryptBytesN(damaged); bytes.Equal(d, data) {
+	if d := aes.TryDecrypt(damaged); bytes.Equal(d, data) {
 		t.Error("Should detect padding error in damaged ciphertext")
 	}
 }

@@ -37,7 +37,7 @@ func TestAESExhaustive(t *testing.T) {
 	// 2. 损坏密文测试 (应能正常处理 Pkcs5UnPadding 失败)
 	damaged := append([]byte(nil), enc...)
 	damaged[len(damaged)-1] ^= 0xFF
-	decN := aes.DecryptBytesN(damaged)
+	decN := aes.TryDecrypt(damaged)
 	if bytes.Equal(decN, data) {
 		t.Fatal("Security Breach: Damaged ciphertext still returned correct plaintext")
 	}
@@ -55,15 +55,15 @@ func TestAsymmetricExhaustive(t *testing.T) {
 	rsa, _ := lcrypto.NewRSAndEraseKey(priv, pub)
 	data := []byte("rsa test data")
 	
-	enc, _ := rsa.Encrypt(data)
-	dec, _ := rsa.Decrypt(enc)
+	enc, _ := rsa.EncryptBytes(data)
+	dec, _ := rsa.DecryptBytes(enc)
 	if !bytes.Equal(data, dec) { t.Fatal("RSA encryption failed") }
 
 	// ECDSA Hybrid (ECDH + AESGCM)
 	priv2, pub2, _ := lcrypto.GenerateECDSAKeyPair(256)
 	ecdsa, _ := lcrypto.NewECDSAndEraseKey(priv2, pub2)
-	enc2, _ := ecdsa.Encrypt(data)
-	dec2, _ := ecdsa.Decrypt(enc2)
+	enc2, _ := ecdsa.EncryptBytes(data)
+	dec2, _ := ecdsa.DecryptBytes(enc2)
 	if !bytes.Equal(data, dec2) { t.Fatal("ECDSA Hybrid encryption failed") }
 }
 
@@ -162,6 +162,6 @@ func BenchmarkX25519_Encrypt(b *testing.B) {
 	data := []byte("performance test data 1kb")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = x.Encrypt(data)
+		_, _ = x.EncryptBytes(data)
 	}
 }
