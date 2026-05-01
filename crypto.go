@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"bytes"
 	"crypto"
 	"errors"
 )
@@ -38,10 +39,7 @@ var (
 // Pkcs5Padding 填充逻辑 (实际上是 PKCS#7，广泛兼容)
 func Pkcs5Padding(data []byte, blockSize int) []byte {
 	padding := blockSize - len(data)%blockSize
-	padtext := make([]byte, padding)
-	for i := range padtext {
-		padtext[i] = byte(padding)
-	}
+	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
 	return append(data, padtext...)
 }
 

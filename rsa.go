@@ -26,10 +26,10 @@ var (
 func NewRSA(safePrivateKeyBuf, safePublicKeyBuf *safe.SafeBuf) (*Asymmetric, error) {
 	return NewAsymmetric(RSA, safePrivateKeyBuf, safePublicKeyBuf)
 }
-func NewRSAndEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
+func NewRSAAndEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
 	return NewAsymmetricAndEraseKey(RSA, safePrivateKeyBuf, safePublicKeyBuf)
 }
-func NewRSAWithOutEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
+func NewRSAWithoutEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
 	return NewAsymmetricWithoutEraseKey(RSA, safePrivateKeyBuf, safePublicKeyBuf, false)
 }
 

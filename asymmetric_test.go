@@ -12,7 +12,7 @@ func TestRSA_AllModes(t *testing.T) {
 	data := []byte("rsa multi-mode test")
 
 	// 1. PSS (Default)
-	a, _ := crypto.NewRSAWithOutEraseKey(priv, pub)
+	a, _ := crypto.NewRSAWithoutEraseKey(priv, pub)
 	sig, _ := a.Sign(data)
 	if ok, _ := a.Verify(data, sig); !ok { t.Error("RSA PSS Sign failed") }
 	enc, _ := a.EncryptBytes(data)
@@ -29,7 +29,7 @@ func TestECDSA_Hybrid(t *testing.T) {
 	priv, pub, _ := crypto.GenerateECDSAKeyPair(256)
 	data := []byte("ecdsa hybrid test")
 
-	a, _ := crypto.NewECDSAndEraseKey(append([]byte(nil), priv...), append([]byte(nil), pub...))
+	a, _ := crypto.NewECDSAAndEraseKey(append([]byte(nil), priv...), append([]byte(nil), pub...))
 	
 	// Test Hybrid Encrypt (ECDH + AESGCM)
 	enc, err := a.EncryptBytes(data)
@@ -59,7 +59,7 @@ func TestX25519_Hybrid(t *testing.T) {
 	priv, pub, _ := crypto.GenerateX25519KeyPair()
 	data := []byte("x25519 data")
 	
-	a, _ := crypto.NewX25519WithOutEraseKey(priv, pub)
+	a, _ := crypto.NewX25519WithoutEraseKey(priv, pub)
 	enc, _ := a.EncryptBytes(data)
 	dec, _ := a.DecryptBytes(enc)
 	if !bytes.Equal(data, dec) { t.Error("X25519 roundtrip failed") }
@@ -69,13 +69,13 @@ func TestAsymmetricErrors(t *testing.T) {
 	_, pub, _ := crypto.GenerateRSAKeyPair(2048)
 	
 	// Only public key
-	a, _ := crypto.NewRSAWithOutEraseKey(nil, pub)
+	a, _ := crypto.NewRSAWithoutEraseKey(nil, pub)
 	if _, err := a.Sign([]byte("x")); err == nil {
 		t.Error("Should fail to sign without private key")
 	}
 	
 	// Missing both
-	aEmpty, _ := crypto.NewRSAWithOutEraseKey(nil, nil)
+	aEmpty, _ := crypto.NewRSAWithoutEraseKey(nil, nil)
 	if _, err := aEmpty.EncryptBytes([]byte("x")); err == nil {
 		t.Error("Should fail to encrypt without public key")
 	}

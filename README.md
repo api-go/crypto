@@ -27,8 +27,8 @@
 - `func (s *Symmetric) TryDecrypt(data []byte) []byte`
 
 ### 非对称加密 (RSA/ECDSA/Ed25519/X25519)
-- `func NewRSAndEraseKey(priv, pub []byte) (*Asymmetric, error)`
-- `func NewECDSAndEraseKey(priv, pub []byte) (*Asymmetric, error)`
+- `func NewRSAAndEraseKey(priv, pub []byte) (*Asymmetric, error)`
+- `func NewECDSAAndEraseKey(priv, pub []byte) (*Asymmetric, error)`
 - `func NewED25519AndEraseKey(priv, pub []byte) (*Asymmetric, error)`
 - `func NewX25519AndEraseKey(priv, pub []byte) (*Asymmetric, error)`
 - `func NewAsymmetricWithoutEraseKey(algo, priv, pub, fastMode) (*Asymmetric, error)`

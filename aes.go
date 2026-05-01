@@ -22,8 +22,8 @@ func NewAESCBCAndEraseKey(key, iv []byte) (*Symmetric, error) {
 	return NewSymmetricAndEraseKey(AESCBC, key, iv)
 }
 
-func NewAESCBCWithOutEraseKey(key, iv []byte) (*Symmetric, error) {
-	return NewSymmetricWithOutEraseKey(AESCBC, key, iv)
+func NewAESCBCWithoutEraseKey(key, iv []byte) (*Symmetric, error) {
+	return NewSymmetricWithoutEraseKey(AESCBC, key, iv)
 }
 
 func NewAESGCM(safeKeyBuf, safeIvBuf *safe.SafeBuf) (*Symmetric, error) {
@@ -34,8 +34,8 @@ func NewAESGCMAndEraseKey(key, iv []byte) (*Symmetric, error) {
 	return NewSymmetricAndEraseKey(AESGCM, key, iv)
 }
 
-func NewAESGCMWithOutEraseKey(key, iv []byte) (*Symmetric, error) {
-	return NewSymmetricWithOutEraseKey(AESGCM, key, iv)
+func NewAESGCMWithoutEraseKey(key, iv []byte) (*Symmetric, error) {
+	return NewSymmetricWithoutEraseKey(AESGCM, key, iv)
 }
 
 func (c *AESCipher) Encrypt(data []byte, key []byte, iv []byte) ([]byte, error) {

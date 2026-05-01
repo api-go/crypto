@@ -29,7 +29,7 @@ func NewX25519(safePrivateKeyBuf, safePublicKeyBuf *safe.SafeBuf) (*Asymmetric, 
 func NewX25519AndEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
 	return NewAsymmetricAndEraseKey(X25519GCM, safePrivateKeyBuf, safePublicKeyBuf)
 }
-func NewX25519WithOutEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
+func NewX25519WithoutEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
 	return NewAsymmetricWithoutEraseKey(X25519GCM, safePrivateKeyBuf, safePublicKeyBuf, false)
 }
 

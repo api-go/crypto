@@ -1,5 +1,15 @@
 # Changelog: @go/crypto
 
+## [v1.0.4] - 2026-05-01
+
+### Fixed
+- **命名规范优化**：修复了多个 `WithOut` -> `Without` 的拼写错误（涉及 AES, RSA, ECDSA, Ed25519, X25519 的构造器）。
+- **接口对齐**：修复了 `NewRSAAndEraseKey` 和 `NewECDSAAndEraseKey` 遗漏 'A' 的问题。
+
+### Optimized
+- **填充性能**：使用 `bytes.Repeat` 优化 `Pkcs5Padding` 和 `AnsiX923Padding` 的执行效率。
+- **并发安全性**：通过 Benchmark 验证了高并发场景下的稳定性。
+
 ## [v1.0.0] - 2026-04-22
 
 ### Added

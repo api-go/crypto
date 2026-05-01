@@ -4,7 +4,7 @@
 
 ## 🤖 AI 行为准则
 1.  **内存安全优先**：首选 `SafeBuf` 接口处理敏感数据（密钥、明文）。
-2.  **场景化构造选择**：C端推荐 `AndEraseKey` 系列；S端高频场景使用 `New...WithOutEraseKey(..., true)` 进入 **FastMode**。
+2.  **场景化构造选择**：C端推荐 `AndEraseKey` 系列；S端高频场景使用 `New...WithoutEraseKey(..., true)` 进入 **FastMode**。
 3.  **闭环义务**：任何构造的 `Asymmetric` 或 `Symmetric` 对象，生成的代码必须包含 `defer obj.Close()`。
 4.  **接口一致性**：所有非对称算法必须实现 `ParsePrivateKey` 与 `ParsePublicKey`。
 
@@ -13,13 +13,13 @@
 ### 对称加密 (Symmetric)
 - `func NewSymmetric(cipher SymmetricCipher, safeKeyBuf, safeIvBuf *safe.SafeBuf) (*Symmetric, error)`
 - `func NewSymmetricAndEraseKey(cipher SymmetricCipher, key, iv []byte) (*Symmetric, error)`
-- `func NewSymmetricWithOutEraseKey(cipher SymmetricCipher, key, iv []byte) (*Symmetric, error)`
+- `func NewSymmetricWithoutEraseKey(cipher SymmetricCipher, key, iv []byte) (*Symmetric, error)`
 - `func NewAESCBC(safeKeyBuf, safeIvBuf *safe.SafeBuf) (*Symmetric, error)`
 - `func NewAESCBCAndEraseKey(key, iv []byte) (*Symmetric, error)`
-- `func NewAESCBCWithOutEraseKey(key, iv []byte) (*Symmetric, error)`
+- `func NewAESCBCWithoutEraseKey(key, iv []byte) (*Symmetric, error)`
 - `func NewAESGCM(safeKeyBuf, safeIvBuf *safe.SafeBuf) (*Symmetric, error)`
 - `func NewAESGCMAndEraseKey(key, iv []byte) (*Symmetric, error)`
-- `func NewAESGCMWithOutEraseKey(key, iv []byte) (*Symmetric, error)`
+- `func NewAESGCMWithoutEraseKey(key, iv []byte) (*Symmetric, error)`
 - `func (s *Symmetric) Close()`
 - `func (s *Symmetric) Encrypt(safeBuf *safe.SafeBuf) ([]byte, error)`
 - `func (s *Symmetric) EncryptAndErase(data []byte) ([]byte, error)`
@@ -34,10 +34,10 @@
 - `func NewAsymmetric(algorithm AsymmetricAlgorithm, safePrivateKeyBuf, safePublicKeyBuf *safe.SafeBuf) (*Asymmetric, error)`
 - `func NewAsymmetricAndEraseKey(algorithm AsymmetricAlgorithm, privateKey, publicKey []byte) (*Asymmetric, error)`
 - `func NewAsymmetricWithoutEraseKey(algorithm AsymmetricAlgorithm, privateKey, publicKey []byte, fastMode bool) (*Asymmetric, error)`
-- `func NewRSA(priv, pub *safe.SafeBuf) (*Asymmetric, error)` / `NewRSAndEraseKey(...)` / `NewRSAWithOutEraseKey(...)`
-- `func NewECDSA(priv, pub *safe.SafeBuf) (*Asymmetric, error)` / `NewECDSAndEraseKey(...)` / `NewECDSAWithOutEraseKey(...)`
-- `func NewED25519(priv, pub *safe.SafeBuf) (*Asymmetric, error)` / `NewED25519AndEraseKey(...)` / `NewED25519WithOutEraseKey(...)`
-- `func NewX25519(priv, pub *safe.SafeBuf) (*Asymmetric, error)` / `NewX25519AndEraseKey(...)` / `NewX25519WithOutEraseKey(...)`
+- `func NewRSA(priv, pub *safe.SafeBuf) (*Asymmetric, error)` / `NewRSAAndEraseKey(...)` / `NewRSAWithoutEraseKey(...)`
+- `func NewECDSA(priv, pub *safe.SafeBuf) (*Asymmetric, error)` / `NewECDSAAndEraseKey(...)` / `NewECDSAWithoutEraseKey(...)`
+- `func NewED25519(priv, pub *safe.SafeBuf) (*Asymmetric, error)` / `NewED25519AndEraseKey(...)` / `NewED25519WithoutEraseKey(...)`
+- `func NewX25519(priv, pub *safe.SafeBuf) (*Asymmetric, error)` / `NewX25519AndEraseKey(...)` / `NewX25519WithoutEraseKey(...)`
 - `func (a *Asymmetric) Close()`
 - `func (a *Asymmetric) Sign(data []byte, hash ...crypto.Hash) ([]byte, error)`
 - `func (a *Asymmetric) SignAndErase(data []byte, hash ...crypto.Hash) ([]byte, error)`

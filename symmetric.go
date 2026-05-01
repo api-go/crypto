@@ -25,11 +25,11 @@ func NewSymmetric(cipher SymmetricCipher, safeKeyBuf, safeIvBuf *safe.SafeBuf) (
 func NewSymmetricAndEraseKey(cipher SymmetricCipher, key, iv []byte) (*Symmetric, error) {
 	defer safe.ZeroMemory(key)
 	defer safe.ZeroMemory(iv)
-	return NewSymmetricWithOutEraseKey(cipher, key, iv)
+	return NewSymmetricWithoutEraseKey(cipher, key, iv)
 }
 
-// NewSymmetricWithOutEraseKey 创建但不擦除传入的密钥与 IV，支持密钥长度自动适配（混淆防御）
-func NewSymmetricWithOutEraseKey(cipher SymmetricCipher, key, iv []byte) (*Symmetric, error) {
+// NewSymmetricWithoutEraseKey 创建但不擦除传入的密钥与 IV，支持密钥长度自动适配（混淆防御）
+func NewSymmetricWithoutEraseKey(cipher SymmetricCipher, key, iv []byte) (*Symmetric, error) {
 	keySize := 16
 	if len(key) >= 32 {
 		keySize = 32

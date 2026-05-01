@@ -28,10 +28,10 @@ var (
 func NewECDSA(safePrivateKeyBuf, safePublicKeyBuf *safe.SafeBuf) (*Asymmetric, error) {
 	return NewAsymmetric(ECDSAGCM, safePrivateKeyBuf, safePublicKeyBuf)
 }
-func NewECDSAndEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
+func NewECDSAAndEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
 	return NewAsymmetricAndEraseKey(ECDSAGCM, safePrivateKeyBuf, safePublicKeyBuf)
 }
-func NewECDSAWithOutEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
+func NewECDSAWithoutEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
 	return NewAsymmetricWithoutEraseKey(ECDSAGCM, safePrivateKeyBuf, safePublicKeyBuf, false)
 }
 

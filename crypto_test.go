@@ -27,7 +27,7 @@ func TestAESExhaustive(t *testing.T) {
 	iv := []byte("1234567890123456")
 	data := []byte("hello aes exhaustive testing")
 
-	aes, _ := lcrypto.NewAESCBCWithOutEraseKey(key, iv)
+	aes, _ := lcrypto.NewAESCBCWithoutEraseKey(key, iv)
 
 	// 1. 正常加解密
 	enc, _ := aes.EncryptBytes(data)
@@ -43,7 +43,7 @@ func TestAESExhaustive(t *testing.T) {
 	}
 
 	// 3. 非法 Key 长度测试
-	_, err := lcrypto.NewAESCBCWithOutEraseKey([]byte("too short"), iv)
+	_, err := lcrypto.NewAESCBCWithoutEraseKey([]byte("too short"), iv)
 	if err == nil {
 		t.Fatal("Edge failure: Accepted invalid key size")
 	}
@@ -52,7 +52,7 @@ func TestAESExhaustive(t *testing.T) {
 func TestAsymmetricExhaustive(t *testing.T) {
 	// RSA OAEP
 	priv, pub, _ := lcrypto.GenerateRSAKeyPair(2048)
-	rsa, _ := lcrypto.NewRSAndEraseKey(priv, pub)
+	rsa, _ := lcrypto.NewRSAAndEraseKey(priv, pub)
 	data := []byte("rsa test data")
 	
 	enc, _ := rsa.EncryptBytes(data)
@@ -61,7 +61,7 @@ func TestAsymmetricExhaustive(t *testing.T) {
 
 	// ECDSA Hybrid (ECDH + AESGCM)
 	priv2, pub2, _ := lcrypto.GenerateECDSAKeyPair(256)
-	ecdsa, _ := lcrypto.NewECDSAndEraseKey(priv2, pub2)
+	ecdsa, _ := lcrypto.NewECDSAAndEraseKey(priv2, pub2)
 	enc2, _ := ecdsa.EncryptBytes(data)
 	dec2, _ := ecdsa.DecryptBytes(enc2)
 	if !bytes.Equal(data, dec2) { t.Fatal("ECDSA Hybrid encryption failed") }
@@ -86,7 +86,7 @@ func TestAnsiX923Padding(t *testing.T) {
 func TestConcurrentSafe(t *testing.T) {
 	key := []byte("1234567890123456")
 	iv := []byte("1234567890123456")
-	aes, _ := lcrypto.NewAESGCMWithOutEraseKey(key, iv)
+	aes, _ := lcrypto.NewAESGCMWithoutEraseKey(key, iv)
 	data := []byte("concurrent data")
 
 	done := make(chan bool)
@@ -108,7 +108,7 @@ func BenchmarkAES_GCM(b *testing.B) {
 	key := make([]byte, 32)
 	iv := make([]byte, 12)
 	data := make([]byte, 1024)
-	aes, _ := lcrypto.NewAESGCMWithOutEraseKey(key, iv)
+	aes, _ := lcrypto.NewAESGCMWithoutEraseKey(key, iv)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = aes.EncryptBytes(data)
@@ -119,7 +119,7 @@ func BenchmarkAES_CBC(b *testing.B) {
 	key := make([]byte, 32)
 	iv := make([]byte, 16)
 	data := make([]byte, 1024)
-	aes, _ := lcrypto.NewAESCBCWithOutEraseKey(key, iv)
+	aes, _ := lcrypto.NewAESCBCWithoutEraseKey(key, iv)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = aes.EncryptBytes(data)
@@ -128,7 +128,7 @@ func BenchmarkAES_CBC(b *testing.B) {
 
 func BenchmarkRSA_Sign(b *testing.B) {
 	priv, pub, _ := lcrypto.GenerateRSAKeyPair(2048)
-	rsa, _ := lcrypto.NewRSAndEraseKey(priv, pub)
+	rsa, _ := lcrypto.NewRSAAndEraseKey(priv, pub)
 	data := []byte("performance test")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -138,7 +138,7 @@ func BenchmarkRSA_Sign(b *testing.B) {
 
 func BenchmarkECDSA_Sign(b *testing.B) {
 	priv, pub, _ := lcrypto.GenerateECDSAKeyPair(256)
-	ecdsa, _ := lcrypto.NewECDSAndEraseKey(priv, pub)
+	ecdsa, _ := lcrypto.NewECDSAAndEraseKey(priv, pub)
 	data := []byte("performance test")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

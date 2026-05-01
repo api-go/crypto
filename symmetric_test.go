@@ -13,7 +13,7 @@ func TestSymmetricObfuscation(t *testing.T) {
 	iv := bytes.Repeat([]byte{0x02}, 16)
 	data := []byte("secret data")
 
-	aes, err := crypto.NewAESGCMWithOutEraseKey(longKey, iv)
+	aes, err := crypto.NewAESGCMWithoutEraseKey(longKey, iv)
 	if err != nil { t.Fatal(err) }
 	
 	enc, err := aes.EncryptBytes(data)
@@ -31,7 +31,7 @@ func TestSymmetricPadding(t *testing.T) {
 	data := []byte("test padding data")
 
 	// PKCS5 (Default)
-	aes, _ := crypto.NewAESCBCWithOutEraseKey(key, iv)
+	aes, _ := crypto.NewAESCBCWithoutEraseKey(key, iv)
 	enc, _ := aes.EncryptBytes(data)
 	dec, _ := aes.DecryptBytes(enc)
 	if !bytes.Equal(data, dec) { t.Error("PKCS5 roundtrip failed") }
@@ -47,7 +47,7 @@ func TestSymmetricPadding(t *testing.T) {
 func TestConcurrentSymmetric(t *testing.T) {
 	key := []byte("1234567890123456")
 	iv := []byte("1234567890123456")
-	aes, _ := crypto.NewAESGCMWithOutEraseKey(key, iv)
+	aes, _ := crypto.NewAESGCMWithoutEraseKey(key, iv)
 	data := []byte("concurrent")
 
 	for i := 0; i < 50; i++ {
