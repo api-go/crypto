@@ -9,6 +9,12 @@ require (
 )
 
 require (
-	apigo.cc/go/rand v1.0.4 // indirect
+	apigo.cc/go/rand v1.0.5 // indirect
 	golang.org/x/sys v0.43.0 // indirect
 )
+
+replace apigo.cc/go/encoding => ../encoding
+
+replace apigo.cc/go/safe => ../safe
+
+replace apigo.cc/go/rand => ../rand
