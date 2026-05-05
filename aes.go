@@ -3,6 +3,7 @@ package crypto
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"errors"
 
 	"apigo.cc/go/safe"
 )
@@ -71,6 +72,9 @@ func (c *AESCipher) Decrypt(data []byte, key []byte, iv []byte) ([]byte, error) 
 		return aesgcm.Open(nil, iv[:aesgcm.NonceSize()], data, nil)
 	}
 	blockMode := cipher.NewCBCDecrypter(block, iv[:block.BlockSize()])
+	if len(data)%block.BlockSize() != 0 {
+		return nil, errors.New("crypto/cipher: input not full blocks")
+	}
 	origData := make([]byte, len(data))
 	blockMode.CryptBlocks(origData, data)
 	return Pkcs5UnPadding(origData), nil

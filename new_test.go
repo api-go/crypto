@@ -4,50 +4,60 @@ import (
 	"bytes"
 	"testing"
 
+	"apigo.cc/go/cast"
 	"apigo.cc/go/crypto"
 )
 
 func TestMustAndTryMethods(t *testing.T) {
-	// Setup
-	priv, pub, _ := crypto.GenerateRSAKeyPair(2048)
-	a, _ := crypto.NewRSAWithoutEraseKey(priv, pub)
-	data := []byte("secret")
-	
-	// Symmetric
 	key := []byte("1234567890123456")
 	iv := []byte("1234567890123456")
-	s, _ := crypto.NewAESGCMWithoutEraseKey(key, iv)
+	data := []byte("hello world")
+
+	s, _ := crypto.NewAESCBCAndEraseKey(key, iv)
 	encS, _ := s.EncryptBytes(data)
 
-	// Tests
-	if !bytes.Equal(s.MustEncrypt(data), encS) {
-		t.Error("MustEncrypt mismatch")
-	}
-	if !bytes.Equal(s.MustDecrypt(encS), data) {
-		t.Error("MustDecrypt mismatch")
-	}
-	if !bytes.Equal(s.TryDecrypt([]byte("bad")), []byte("bad")) {
-		t.Error("TryDecrypt should return original on error")
-	}
-	
-	// Re-encrypt to get fresh ciphertext for asymmetric
-	encA, _ := a.EncryptBytes(data)
-	decA := a.MustDecrypt(encA)
-	if !bytes.Equal(decA, data) {
-		t.Errorf("Asymmetric MustDecrypt mismatch: got %s, want %s", string(decA), string(data))
-	}
-	
-	// Test MustEncrypt specifically (e.g. check it works at all)
-	encA2 := a.MustEncrypt(data)
-	decA2 := a.MustDecrypt(encA2)
-	if !bytes.Equal(decA2, data) {
-		t.Errorf("Asymmetric MustEncrypt/Decrypt failed")
+	// Test with cast.As
+	if !bytes.Equal(cast.As(s.EncryptBytes(data)), encS) {
+		t.Error("EncryptBytes with cast.As mismatch")
 	}
 
-	if !bytes.Equal(a.TryDecrypt([]byte("bad")), []byte("bad")) {
-		t.Error("Asymmetric TryDecrypt should return original on error")
+	if !bytes.Equal(cast.As(s.DecryptBytes(encS)), data) {
+		t.Error("DecryptBytes with cast.As mismatch")
 	}
-	if len(a.MustSign(data)) == 0 {
-		t.Error("MustSign failed")
+
+	// Test TryDecrypt
+	if !bytes.Equal(s.TryDecrypt(encS), data) {
+		t.Error("TryDecrypt match failed")
+	}
+	if !bytes.Equal(s.TryDecrypt([]byte("invalid")), []byte("invalid")) {
+		t.Error("TryDecrypt fallback failed")
+	}
+
+	// Asymmetric
+	priv, pub, _ := crypto.GenerateRSAKeyPair(2048)
+	a, _ := crypto.NewRSAAndEraseKey(priv, pub)
+	encA, _ := a.EncryptBytes(data)
+
+	decA := cast.As(a.DecryptBytes(encA))
+	if !bytes.Equal(decA, data) {
+		t.Errorf("Asymmetric DecryptBytes with cast.As mismatch: got %s, want %s", string(decA), string(data))
+	}
+
+	// Test cast.As for EncryptBytes
+	encA2 := cast.As(a.EncryptBytes(data))
+	decA2 := cast.As(a.DecryptBytes(encA2))
+	if !bytes.Equal(decA2, data) {
+		t.Errorf("Asymmetric Encrypt/Decrypt via cast.As failed")
+	}
+
+	// Test Sign with cast.As
+	sig := cast.As(a.Sign(data))
+	if len(sig) == 0 {
+		t.Error("Sign with cast.As failed")
+	}
+	
+	valid, _ := a.Verify(data, sig)
+	if !valid {
+		t.Error("Verify failed")
 	}
 }

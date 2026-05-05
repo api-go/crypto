@@ -1,3 +1,5 @@
+apigo.cc/go/cast v1.2.8 h1:plb676DH2TjYljzf8OEMGT6lIhmZ/xaxEFfs0kDOiSI=
+apigo.cc/go/cast v1.2.8/go.mod h1:lGlwImiOvHxG7buyMWhFzcdvQzmSaoKbmr7bcDfUpHk=
 golang.org/x/crypto v0.50.0 h1:zO47/JPrL6vsNkINmLoo/PH1gcxpls50DNogFvB5ZGI=
 golang.org/x/crypto v0.50.0/go.mod h1:3muZ7vA7PBCE6xgPX7nkzzjiUq87kRItoJQM1Yo8S+Q=
 golang.org/x/sys v0.43.0 h1:Rlag2XtaFTxp19wS8MXlJwTvoh8ArU6ezoyFsMyCTNI=

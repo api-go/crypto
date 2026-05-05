@@ -81,15 +81,6 @@ func (s *Symmetric) EncryptBytes(data []byte) ([]byte, error) {
 	return s.cipher.Encrypt(data, key.Data, iv.Data)
 }
 
-// MustEncrypt 加密失败时返回空字节切片 (静默加密)
-func (s *Symmetric) MustEncrypt(data []byte) []byte {
-	r, err := s.EncryptBytes(data)
-	if err != nil {
-		return []byte{}
-	}
-	return r
-}
-
 // Decrypt 进行解密并返回一个受保护的 SafeBuf
 func (s *Symmetric) Decrypt(data []byte) (*safe.SafeBuf, error) {
 	buf, err := s.DecryptBytes(data)
@@ -109,16 +100,7 @@ func (s *Symmetric) DecryptBytes(data []byte) ([]byte, error) {
 	return s.cipher.Decrypt(data, key.Data, iv.Data)
 }
 
-// MustDecryptBytes 解密失败时返回空字节切片 (静默解密)
-func (s *Symmetric) MustDecrypt(data []byte) []byte {
-	r, err := s.DecryptBytes(data)
-	if err != nil {
-		return []byte{}
-	}
-	return r
-}
-
-// TryDecryptBytes 解密失败时返回原始数据 (静默解密)
+// TryDecrypt 解密失败时返回原始数据 (静默解密)
 func (s *Symmetric) TryDecrypt(data []byte) []byte {
 	r, err := s.DecryptBytes(data)
 	if err != nil {

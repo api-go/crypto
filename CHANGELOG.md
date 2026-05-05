@@ -1,5 +1,18 @@
 # Changelog: @go/crypto
 
+## [v1.0.6] - 2026-05-06
+
+### Changed
+- **设计哲学对齐**：全面废除 `Must` 前缀函数（`MustEncrypt`, `MustDecrypt`, `MustSign`, `MustVerify`），改为配合 `go/cast` 的 `As` 函数。
+- **鲁棒性增强**：在 `AESCipher.Decrypt` (CBC 模式) 中增加数据长度校验，防止因输入非块大小倍数而导致的 Panic。
+
+### Added
+- **API 补全**：新增 `TryDecrypt` 方法，在解密失败时返回原始数据。
+- **依赖对齐**：引入 `apigo.cc/go/cast` 依赖。
+
+## [v1.0.5] - 2026-05-01
+- (同步版本号)
+
 ## [v1.0.4] - 2026-05-01
 
 ### Fixed

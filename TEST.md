@@ -1,38 +1,25 @@
 # Test Report: @go/crypto
 
 ## 📋 测试概览
-- **测试时间**: 2026-05-01
+- **测试时间**: 2026-05-06
 - **测试环境**: darwin/amd64
 - **Go 版本**: 1.25.0
 
 ## ✅ 功能测试 (Functional Tests)
 | 场景 | 状态 | 描述 |
 | :--- | :--- | :--- |
-| `TestRSA_AllModes` | PASS | 覆盖 RSA PSS/OAEP 以及 FastMode 缓存模式。 |
-| `TestECDSA_Hybrid` | PASS | 验证 ECDH + HKDF + AESGCM 混合加解密链路。 |
-| `TestEd25519` | PASS | 纯签名/验签逻辑验证。 |
-| `TestX25519_Hybrid` | PASS | 验证 X25519 混合加解密链路。 |
-| `TestSecurityErase` | PASS | **核心安全测试**：验证 `AndEraseKey` 调用后原始密钥内存确实被物理擦除。 |
-| `TestSymmetricObfuscation` | PASS | 验证传入 64 字节混淆密钥时，自动截断适配 32 字节 AES 密钥的逻辑。 |
-| `TestAnsiX923Padding` | PASS | 验证 ANSI X9.23 填充算法的一致性。 |
-| `TestConcurrentSafe` | PASS | 验证 `Symmetric` 对象在高并发环境下的数据隔离与安全性。 |
-| `TestHashCompatibility` | PASS | 确保封装的 Hash API 与标准库 MD5/SHA256/HMAC 结果 1:1 对齐。 |
+| `TestSymmetric` | PASS | AES-CBC/GCM 加解密往返测试。 |
+| `TestAsymmetric` | PASS | RSA, ECDSA, Ed25519, X25519 签名与加解密测试。 |
+| `TestMustAndTryMethods` | PASS | 配合 `cast.As` 消除摩擦及 `TryDecrypt` 逻辑测试。 |
+| `TestSecurityErase` | PASS | 密钥内存安全擦除验证。 |
 
 ## 🛡️ 鲁棒性防御 (Robustness)
-- **密钥混淆**：支持超长密钥输入以混淆内存特征，内部自动适配 16/24/32 字节核心密钥。
-- **命名一致性**：修复了所有 `Without` 的拼写错误，确保 API 调用链路语义严谨。
-- **填充优化**：使用 `bytes.Repeat` 替代循环填充，降低 GC 压力并提升性能稳定性。
+- **Panic 防御**：在 CBC 模式解密中强制校验块对齐，拦截底层库可能抛出的 Panic。
+- **内存安全**：基于 `go/safe` 的密钥管理与自动释放。
 
 ## ⚡ 性能基准 (Benchmarks)
-| 算法类型 | 耗时 (ns/op) | 性能倍率 (对比 RSA) | 结论 |
-| :--- | :--- | :--- | :--- |
-| **Ed25519 签名** | **~25605** | **50.2x** | **性能冠军**，极力推荐。 |
-| **ECDSA 签名** | **~49507** | **26.0x** | 现代 Web 标准，性能卓越。 |
-| **X25519 混合加密** | **~189939** | **6.8x** | 适合非对称大数据量加密。 |
-| **RSA-2048 签名** | **~1286459**| **1.0x** | **性能瓶颈**，仅建议用于兼容。 |
-| **AES-GCM** | **~4746** | - | 优于 CBC，首选对称算法。 |
-
-> **首席架构师建议**：
-> 1. 云端高并发：优先 Ed25519 签名 + AES-GCM 对称加密。
-> 2. 传统兼容：使用 RSA-2048 + FastMode。
-> 3. 混合加密：大数据量直接用 X25519/ECDSA 的 `Encrypt` 方法。
+| 函数 | 平均耗时 | 性能分析 |
+| :--- | :--- | :--- |
+| `AES_GCM` | **4805 ns/op** | 性能优异。 |
+| `RSA_Sign` | **1349477 ns/op** | 复合 RSA 标准耗时。 |
+| `Ed25519_Sign` | **26689 ns/op** | 高性能签名。 |

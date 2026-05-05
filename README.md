@@ -1,69 +1,60 @@
 # 关于本项目
+
 本项目完全由 AI 维护。代码源自 github.com/ssgo/u 的重构。
 
 # @go/crypto
 
-`@go/crypto` 是一个为“极速开发、内存级防御、全业务适配”设计的全功能加密工具库。它深度集成内存锁定与物理擦除技术，为金融级和 C 端运行环境提供了底层安全保障，同时为高并发服务端提供极致的性能模式。
+`@go/crypto` 是一个为“安全闭环、消除摩擦”设计的加密工具库。它强制执行内存安全（基于 `go/safe`）与资源自动回收，并提供语义化的加解密与 Hash API。
 
 ## 🎯 设计哲学
 
-*   **防御优先 (SafeMode)**：默认采用 `AndEraseKey` 范式，密钥构造即擦除原始明文，杜绝内存残留。
-*   **性能巅峰 (FastMode)**：针对高并发场景（如 API 签名），提供对象缓存模式，显著降低 CPU 消耗。
-*   **混合加解密**：原生支持非对称混合加密逻辑（ECDH + HKDF + AES），支持任意长度数据加密。
-*   **混淆适配**：对称加密支持密钥自动截断，允许传入超长 buffer 以混淆内存特征。
+*   **内存安全闭环**：通过 `safe.SafeBuf` 保护密钥，确保敏感数据在内存中加密存储，并在使用后自动/手动擦除，防止内存 Dump 攻击。
+*   **消除摩擦 (Frictionless)**：废除 `Must` 前缀函数，全面结合 `go/cast` 的 `As` 函数。
+*   **资源自动回收**：利用 `runtime.SetFinalizer` 确保加密实例在垃圾回收时自动释放密钥资源。
+*   **高性能混合体系**：内置 AES (CBC/GCM)、RSA (PSS/OAEP)、ECDSA、Ed25519、X25519，支持 FastMode 缓存解析结果。
 
 ## 🛠 API Reference
 
-### 对称加密 (AES-CBC/GCM)
+### 对称加密 (Symmetric)
+- `func NewAESCBC(safeKeyBuf, safeIvBuf *safe.SafeBuf) (*Symmetric, error)`
 - `func NewAESCBCAndEraseKey(key, iv []byte) (*Symmetric, error)`
-- `func NewAESGCMAndEraseKey(key, iv []byte) (*Symmetric, error)`
-- `func (s *Symmetric) Encrypt(safeBuf *safe.SafeBuf) ([]byte, error)`
-- `func (s *Symmetric) EncryptAndErase(data []byte) ([]byte, error)`
 - `func (s *Symmetric) EncryptBytes(data []byte) ([]byte, error)`
-- `func (s *Symmetric) MustEncrypt(data []byte) []byte`
-- `func (s *Symmetric) Decrypt(data []byte) (*safe.SafeBuf, error)`
 - `func (s *Symmetric) DecryptBytes(data []byte) ([]byte, error)`
-- `func (s *Symmetric) MustDecrypt(data []byte) []byte`
-- `func (s *Symmetric) TryDecrypt(data []byte) []byte`
+- `func (s *Symmetric) TryDecrypt(data []byte) []byte` (解密失败返回原始数据)
 
-### 非对称加密 (RSA/ECDSA/Ed25519/X25519)
-- `func NewRSAAndEraseKey(priv, pub []byte) (*Asymmetric, error)`
-- `func NewECDSAAndEraseKey(priv, pub []byte) (*Asymmetric, error)`
-- `func NewED25519AndEraseKey(priv, pub []byte) (*Asymmetric, error)`
-- `func NewX25519AndEraseKey(priv, pub []byte) (*Asymmetric, error)`
-- `func NewAsymmetricWithoutEraseKey(algo, priv, pub, fastMode) (*Asymmetric, error)`
+### 非对称加密与签名 (Asymmetric)
+- `func NewRSA(safePrivateKeyBuf, safePublicKeyBuf *safe.SafeBuf) (*Asymmetric, error)`
 - `func (a *Asymmetric) Sign(data []byte, hash ...crypto.Hash) ([]byte, error)`
-- `func (a *Asymmetric) SignAndErase(data []byte, hash ...crypto.Hash) ([]byte, error)`
-- `func (a *Asymmetric) MustSign(data []byte, hash ...crypto.Hash) []byte`
 - `func (a *Asymmetric) Verify(data, signature []byte, hash ...crypto.Hash) (bool, error)`
-- `func (a *Asymmetric) MustVerify(data, signature []byte, hash ...crypto.Hash) bool`
-- `func (a *Asymmetric) Encrypt(safeBuf *safe.SafeBuf) ([]byte, error)`
-- `func (a *Asymmetric) EncryptAndErase(data []byte) ([]byte, error)`
-- `func (a *Asymmetric) MustEncrypt(data []byte) []byte`
-- `func (a *Asymmetric) Decrypt(data []byte) (*safe.SafeBuf, error)`
+- `func (a *Asymmetric) EncryptBytes(data []byte) ([]byte, error)`
 - `func (a *Asymmetric) DecryptBytes(data []byte) ([]byte, error)`
-- `func (a *Asymmetric) MustDecrypt(data []byte) []byte`
-- `func (a *Asymmetric) TryDecrypt(data []byte) []byte`
 
-### Hash 系列 (MD5/SHA)
-- `func MD5(data ...[]byte) []byte` / `func MD5ToHex(d []byte) string`
-- `func Sha256ToHex(d []byte) string` / `func Sha256ToBase64(d []byte) string` / `func Sha256ToUrlBase64(d []byte) string`
-- *其他算法 (Sha1, Sha512) 均支持上述 Hex/Base64/UrlBase64 变体*
-
-### 密钥对生成
+### 密钥生成
 - `func GenerateRSAKeyPair(bitSize int) (priv, pub []byte, err error)`
 - `func GenerateECDSAKeyPair(bitSize int) (priv, pub []byte, err error)`
 - `func GenerateEd25519KeyPair() (priv, pub []byte, err error)`
 - `func GenerateX25519KeyPair() (priv, pub []byte, err error)`
 
-## 🚀 FastMode 性能模式
-在高并发服务端对接场景中，内存被恶意扫描的风险极低，但 CPU 压力巨大。
-Ed25519的非FastMode模式下性能也完全无损，强烈建议优先使用该算法。
-**建议：** 使用 `NewAsymmetricWithoutEraseKey(..., true)`。
-*   **效果**：缓存解析后的密钥对象。
-*   **性能**：实测签名速度可提升数倍，相比默认模式能支持更高的 QPS。
+### 哈希算法 (Hash)
+- `func MD5(data []byte) []byte`
+- `func Sha256(data []byte) []byte`
+- `func HmacSha256(data, key []byte) []byte`
 
 ## 📦 安装
+
 ```bash
 go get apigo.cc/go/crypto
+```
+
+## 💡 示例 (配合 cast.As 消除摩擦)
+
+```go
+import (
+    "apigo.cc/go/crypto"
+    "apigo.cc/go/cast"
+)
+
+// 使用 cast.As 替代原有的 MustEncrypt 系列
+cipher, _ := crypto.NewAESCBCAndEraseKey(key, iv)
+ciphertext := cast.As(cipher.EncryptBytes(plaintext))
 ```

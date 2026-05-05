@@ -9,6 +9,7 @@ require (
 )
 
 require (
+	apigo.cc/go/cast v1.2.8 // indirect
 	apigo.cc/go/rand v1.0.5 // indirect
 	golang.org/x/sys v0.43.0 // indirect
 )

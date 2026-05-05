@@ -94,14 +94,6 @@ func (a *Asymmetric) SignAndErase(data []byte, hash ...crypto.Hash) ([]byte, err
 	return a.Sign(data, hash...)
 }
 
-func (a *Asymmetric) MustSign(data []byte, hash ...crypto.Hash) []byte {
-	signature, err := a.Sign(data, hash...)
-	if err != nil {
-		return []byte{}
-	}
-	return signature
-}
-
 func (a *Asymmetric) Verify(data []byte, signature []byte, hash ...crypto.Hash) (bool, error) {
 	if a.pubCache != nil {
 		return a.algorithm.Verify(a.pubCache, data, signature, hash...)
@@ -116,14 +108,6 @@ func (a *Asymmetric) Verify(data []byte, signature []byte, hash ...crypto.Hash) 
 		return false, err
 	}
 	return a.algorithm.Verify(pubKey, data, signature, hash...)
-}
-
-func (a *Asymmetric) MustVerify(data []byte, signature []byte, hash ...crypto.Hash) bool {
-	valid, err := a.Verify(data, signature, hash...)
-	if err != nil {
-		return false
-	}
-	return valid
 }
 
 func (a *Asymmetric) Encrypt(safeBuf *safe.SafeBuf) ([]byte, error) {
@@ -158,14 +142,6 @@ func (a *Asymmetric) EncryptBytes(data []byte) ([]byte, error) {
 	return cipherAlgo.Encrypt(pubKey, data)
 }
 
-func (a *Asymmetric) MustEncrypt(data []byte) []byte {
-	enc, err := a.EncryptBytes(data)
-	if err != nil {
-		return []byte{}
-	}
-	return enc
-}
-
 func (a *Asymmetric) Decrypt(data []byte) (*safe.SafeBuf, error) {
 	buf, err := a.DecryptBytes(data)
 	if err != nil {
@@ -192,14 +168,6 @@ func (a *Asymmetric) DecryptBytes(data []byte) ([]byte, error) {
 		return nil, err
 	}
 	return cipherAlgo.Decrypt(privKey, data)
-}
-
-func (a *Asymmetric) MustDecrypt(data []byte) []byte {
-	dec, err := a.DecryptBytes(data)
-	if err != nil {
-		return []byte{}
-	}
-	return dec
 }
 
 func (a *Asymmetric) TryDecrypt(data []byte) []byte {
