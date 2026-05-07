@@ -33,6 +33,16 @@ func NewX25519WithoutEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asym
 	return NewAsymmetricWithoutEraseKey(X25519GCM, safePrivateKeyBuf, safePublicKeyBuf, false)
 }
 
+func NewX25519ByPassword(password, salt []byte) (*Asymmetric, error) {
+	seed := DeriveKey(password, salt, 32)
+	defer safe.ZeroMemory(seed)
+	pubKey, err := curve25519.X25519(seed, curve25519.Basepoint)
+	if err != nil {
+		return nil, err
+	}
+	return NewX25519AndEraseKey(seed, pubKey)
+}
+
 func NewX25519Algorithm(useGCM bool, hash crypto.Hash, kdfInfo, kdfSalt []byte) *X25519Algorithm {
 	return &X25519Algorithm{UseGCM: useGCM, Hash: hash, KdfInfo: kdfInfo, KdfSalt: kdfSalt}
 }

@@ -8,6 +8,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"io"
+	"math/big"
 
 	"apigo.cc/go/safe"
 	"golang.org/x/crypto/hkdf"
@@ -33,6 +34,50 @@ func NewECDSAAndEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetri
 }
 func NewECDSAWithoutEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmetric, error) {
 	return NewAsymmetricWithoutEraseKey(ECDSAGCM, safePrivateKeyBuf, safePublicKeyBuf, false)
+}
+
+func NewECDSAByPassword(password, salt []byte, bitSize ...int) (*Asymmetric, error) {
+	size := 256
+	if len(bitSize) > 0 {
+		size = bitSize[0]
+	}
+	var curve elliptic.Curve
+	keyLen := 32
+	switch size {
+	case 256:
+		curve = elliptic.P256()
+		keyLen = 32
+	case 384:
+		curve = elliptic.P384()
+		keyLen = 48
+	default:
+		curve = elliptic.P521()
+		keyLen = 66 // (521+7)/8
+	}
+
+	seed := DeriveKey(password, salt, uint32(keyLen))
+	defer safe.ZeroMemory(seed)
+
+	params := curve.Params()
+	d := new(big.Int).SetBytes(seed)
+	nMinusOne := new(big.Int).Sub(params.N, big.NewInt(1))
+	d.Mod(d, nMinusOne)
+	d.Add(d, big.NewInt(1))
+
+	priv := new(ecdsa.PrivateKey)
+	priv.Curve = curve
+	priv.D = d
+	priv.PublicKey.X, priv.PublicKey.Y = curve.ScalarBaseMult(d.Bytes())
+
+	privateKey, err := x509.MarshalECPrivateKey(priv)
+	if err != nil {
+		return nil, err
+	}
+	publicKey, err := x509.MarshalPKIXPublicKey(&priv.PublicKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewECDSAAndEraseKey(privateKey, publicKey)
 }
 
 func NewECDSAAlgorithm(useGCM bool, hash crypto.Hash, kdfInfo, kdfSalt []byte) *ECDSAAlgorithm {

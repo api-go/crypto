@@ -18,12 +18,18 @@
 ### 对称加密 (Symmetric)
 - `func NewAESCBC(safeKeyBuf, safeIvBuf *safe.SafeBuf) (*Symmetric, error)`
 - `func NewAESCBCAndEraseKey(key, iv []byte) (*Symmetric, error)`
+- `func NewAESCBCByPassword(password, salt []byte) (*Symmetric, error)` (Argon2id 驱动)
+- `func NewAESGCMByPassword(password, salt []byte) (*Symmetric, error)` (Argon2id 驱动)
 - `func (s *Symmetric) EncryptBytes(data []byte) ([]byte, error)`
 - `func (s *Symmetric) DecryptBytes(data []byte) ([]byte, error)`
 - `func (s *Symmetric) TryDecrypt(data []byte) []byte` (解密失败返回原始数据)
 
 ### 非对称加密与签名 (Asymmetric)
 - `func NewRSA(safePrivateKeyBuf, safePublicKeyBuf *safe.SafeBuf) (*Asymmetric, error)`
+- `func NewRSAByPassword(password, salt []byte, bitSize ...int) (*Asymmetric, error)` (Argon2id 确定性生成)
+- `func NewECDSAByPassword(password, salt []byte, bitSize ...int) (*Asymmetric, error)` (确定性生成)
+- `func NewED25519ByPassword(password, salt []byte) (*Asymmetric, error)` (确定性生成)
+- `func NewX25519ByPassword(password, salt []byte) (*Asymmetric, error)` (确定性生成)
 - `func (a *Asymmetric) Sign(data []byte, hash ...crypto.Hash) ([]byte, error)`
 - `func (a *Asymmetric) Verify(data, signature []byte, hash ...crypto.Hash) (bool, error)`
 - `func (a *Asymmetric) EncryptBytes(data []byte) ([]byte, error)`

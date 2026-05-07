@@ -33,6 +33,30 @@ func NewRSAWithoutEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asymmet
 	return NewAsymmetricWithoutEraseKey(RSA, safePrivateKeyBuf, safePublicKeyBuf, false)
 }
 
+func NewRSAByPassword(password, salt []byte, bitSize ...int) (*Asymmetric, error) {
+	size := 2048
+	if len(bitSize) > 0 {
+		size = bitSize[0]
+	}
+	seed := DeriveKey(password, salt, 32)
+	defer safe.ZeroMemory(seed)
+	reader := NewDeterministicReader(seed, []byte("RSA Key Generation"))
+
+	priKey, err := rsa.GenerateKey(reader, size)
+	if err != nil {
+		return nil, err
+	}
+	privateKey, err := x509.MarshalPKCS8PrivateKey(priKey)
+	if err != nil {
+		return nil, err
+	}
+	publicKey, err := x509.MarshalPKIXPublicKey(&priKey.PublicKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewRSAAndEraseKey(privateKey, publicKey)
+}
+
 func GenerateRSAKeyPair(bitSize int) ([]byte, []byte, error) {
 	if bitSize < 2048 {
 		bitSize = 2048

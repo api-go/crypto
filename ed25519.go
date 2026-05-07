@@ -23,6 +23,14 @@ func NewED25519WithoutEraseKey(safePrivateKeyBuf, safePublicKeyBuf []byte) (*Asy
 	return NewAsymmetricWithoutEraseKey(ED25519, safePrivateKeyBuf, safePublicKeyBuf, false)
 }
 
+func NewED25519ByPassword(password, salt []byte) (*Asymmetric, error) {
+	seed := DeriveKey(password, salt, 32)
+	defer safe.ZeroMemory(seed)
+	privKey := ed25519.NewKeyFromSeed(seed)
+	pubKey := privKey.Public().(ed25519.PublicKey)
+	return NewED25519AndEraseKey(privKey, pubKey)
+}
+
 func GenerateEd25519KeyPair() ([]byte, []byte, error) {
 	pubKey, privKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {

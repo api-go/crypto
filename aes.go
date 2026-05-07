@@ -39,6 +39,18 @@ func NewAESGCMWithoutEraseKey(key, iv []byte) (*Symmetric, error) {
 	return NewSymmetricWithoutEraseKey(AESGCM, key, iv)
 }
 
+func NewAESCBCByPassword(password, salt []byte) (*Symmetric, error) {
+	derived := DeriveKey(password, salt, 32+16)
+	defer safe.ZeroMemory(derived)
+	return NewSymmetricAndEraseKey(AESCBC, derived[:32], derived[32:])
+}
+
+func NewAESGCMByPassword(password, salt []byte) (*Symmetric, error) {
+	derived := DeriveKey(password, salt, 32+12)
+	defer safe.ZeroMemory(derived)
+	return NewSymmetricAndEraseKey(AESGCM, derived[:32], derived[32:])
+}
+
 func (c *AESCipher) Encrypt(data []byte, key []byte, iv []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
