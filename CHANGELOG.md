@@ -1,6 +1,13 @@
 # Changelog: @go/crypto
 
-## [v1.1.0] - 2026-05-07
+## [v1.1.2] - 2026-05-12
+
+### Added
+- **统一配置解密接口 (加固版)**：新增 `OnSetDefaultAES` 回调与 `SetDefaultAES` 注入接口。
+- **极致内存安全**：`SetDefaultAES` 注入生产密钥后将**自动擦除** (ZeroMemory) 传入的密钥源字节，并**自动锁定**注册通道。
+- **基础设施对齐**：同步更新 `redis`, `api`, `db`, `mail` 等项目，移除本地 `confAes`，全面接入安全加固后的 `crypto.confAES` 体系。
+
+## [v1.1.1] - 2026-05-12
 
 ### Added
 - **密码学强化**：新增基于 Argon2id 的密码派生密钥 (KDF) 支持。

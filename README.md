@@ -41,6 +41,12 @@
 - `func GenerateEd25519KeyPair() (priv, pub []byte, err error)`
 - `func GenerateX25519KeyPair() (priv, pub []byte, err error)`
 
+### 全局配置解密 (Default AES)
+为实现全项目配置解密的统一管理与生产环境密钥注入，提供以下全局接口：
+- `var DefaultAES *Symmetric`：全局默认 AES 实例（初始使用内置硬编码密钥）。
+- `func OnSetDefaultAES(h func(*Symmetric))`：注册 `DefaultAES` 变更回调。
+- `func SetDefaultAES(key, iv []byte)`：注入生产环境密钥并触发所有回调更新。
+
 ### 哈希算法 (Hash)
 - `func MD5(data []byte) []byte`
 - `func Sha256(data []byte) []byte`
