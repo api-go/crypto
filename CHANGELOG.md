@@ -1,5 +1,10 @@
 # Changelog: @go/crypto
 
+## [v1.3.2] - 2026-05-30
+
+### Added
+- **JSMOD 注册**：将核心加解密与 Hash 能力注册到 `jsmod`。提供极简的无状态 API，支持 AES (GCM/CBC), RSA (加解密/签名) 以及各类 Hash/HMAC 算法。
+
 ## [v1.1.2] - 2026-05-12
 
 ### Added
