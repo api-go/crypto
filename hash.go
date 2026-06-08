@@ -22,17 +22,17 @@ func MD5(data ...[]byte) []byte {
 
 // MD5ToHex 返回 MD5 的 Hex 字符串
 func MD5ToHex(data []byte) string {
-	return encoding.HexToString(MD5(data))
+	return encoding.Hex(MD5(data))
 }
 
 // MD5ToBase64 返回 MD5 的 Base64 字符串
 func MD5ToBase64(data []byte) string {
-	return encoding.Base64ToString(MD5(data))
+	return encoding.Base64(MD5(data))
 }
 
-// MD5ToUrlBase64 返回 MD5 的 URL 安全 Base64 字符串
-func MD5ToUrlBase64(data []byte) string {
-	return encoding.UrlBase64ToString(MD5(data))
+// MD5ToURLBase64 返回 MD5 的 URL 安全 Base64 字符串
+func MD5ToURLBase64(data []byte) string {
+	return encoding.URLBase64(MD5(data))
 }
 
 // Sha1 系列
@@ -44,9 +44,9 @@ func Sha1(data ...[]byte) []byte {
 	return h.Sum(nil)
 }
 
-func Sha1ToHex(data []byte) string { return encoding.HexToString(Sha1(data)) }
-func Sha1ToBase64(data []byte) string { return encoding.Base64ToString(Sha1(data)) }
-func Sha1ToUrlBase64(data []byte) string { return encoding.UrlBase64ToString(Sha1(data)) }
+func Sha1ToHex(data []byte) string { return encoding.Hex(Sha1(data)) }
+func Sha1ToBase64(data []byte) string { return encoding.Base64(Sha1(data)) }
+func Sha1ToURLBase64(data []byte) string { return encoding.URLBase64(Sha1(data)) }
 
 // Sha256 系列
 func Sha256(data ...[]byte) []byte {
@@ -57,9 +57,9 @@ func Sha256(data ...[]byte) []byte {
 	return h.Sum(nil)
 }
 
-func Sha256ToHex(data []byte) string { return encoding.HexToString(Sha256(data)) }
-func Sha256ToBase64(data []byte) string { return encoding.Base64ToString(Sha256(data)) }
-func Sha256ToUrlBase64(data []byte) string { return encoding.UrlBase64ToString(Sha256(data)) }
+func Sha256ToHex(data []byte) string { return encoding.Hex(Sha256(data)) }
+func Sha256ToBase64(data []byte) string { return encoding.Base64(Sha256(data)) }
+func Sha256ToURLBase64(data []byte) string { return encoding.URLBase64(Sha256(data)) }
 
 // Sha512 系列
 func Sha512(data ...[]byte) []byte {
@@ -70,12 +70,12 @@ func Sha512(data ...[]byte) []byte {
 	return h.Sum(nil)
 }
 
-func Sha512ToHex(data []byte) string { return encoding.HexToString(Sha512(data)) }
-func Sha512ToBase64(data []byte) string { return encoding.Base64ToString(Sha512(data)) }
-func Sha512ToUrlBase64(data []byte) string { return encoding.UrlBase64ToString(Sha512(data)) }
+func Sha512ToHex(data []byte) string { return encoding.Hex(Sha512(data)) }
+func Sha512ToBase64(data []byte) string { return encoding.Base64(Sha512(data)) }
+func Sha512ToURLBase64(data []byte) string { return encoding.URLBase64(Sha512(data)) }
 
 // HMAC 系列
-func HmacMD5(key []byte, data ...[]byte) []byte {
+func HMACMD5(key []byte, data ...[]byte) []byte {
 	h := hmac.New(md5.New, key)
 	for _, v := range data {
 		h.Write(v)
@@ -83,7 +83,7 @@ func HmacMD5(key []byte, data ...[]byte) []byte {
 	return h.Sum(nil)
 }
 
-func HmacSha1(key []byte, data ...[]byte) []byte {
+func HMACSha1(key []byte, data ...[]byte) []byte {
 	h := hmac.New(sha1.New, key)
 	for _, v := range data {
 		h.Write(v)
@@ -91,7 +91,7 @@ func HmacSha1(key []byte, data ...[]byte) []byte {
 	return h.Sum(nil)
 }
 
-func HmacSha256(key []byte, data ...[]byte) []byte {
+func HMACSha256(key []byte, data ...[]byte) []byte {
 	h := hmac.New(sha256.New, key)
 	for _, v := range data {
 		h.Write(v)
@@ -99,7 +99,7 @@ func HmacSha256(key []byte, data ...[]byte) []byte {
 	return h.Sum(nil)
 }
 
-func HmacSha512(key []byte, data ...[]byte) []byte {
+func HMACSha512(key []byte, data ...[]byte) []byte {
 	h := hmac.New(sha512.New, key)
 	for _, v := range data {
 		h.Write(v)

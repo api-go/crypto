@@ -25,7 +25,7 @@ func TestHashCompatibility(t *testing.T) {
 	key := []byte("key")
 	mac := hmac.New(sha256.New, key)
 	mac.Write(data)
-	if !bytes.Equal(crypto.HmacSha256(key, data), mac.Sum(nil)) { t.Error("HmacSha256 mismatch") }
+	if !bytes.Equal(crypto.HMACSha256(key, data), mac.Sum(nil)) { t.Error("HMACSha256 mismatch") }
 }
 
 func TestHashString(t *testing.T) {
