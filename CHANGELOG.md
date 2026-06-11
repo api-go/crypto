@@ -1,5 +1,8 @@
 # Changelog: @go/crypto
 
+## v1.5.2 (2026-06-11)
+- **版本对齐**: 基础设施全局对齐 v1.5.2。
+
 ## v1.5.1 (2026-06-08)
 - **JS 对齐 & 缩写规范**: 将所有注册到 `jsmod` 的方法名统一为 PascalCase，并强制将缩写（如 MD5, SHA1, HMAC, RSA, AES, URL）全大写。
 - **源码纠偏**: 修正了 `hash.go` 中错误的缩写命名（`UrlBase64` -> `URLBase64`），并同步更新了 `encoding` v1.5.2 的 API 调用。
