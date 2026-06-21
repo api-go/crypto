@@ -1,5 +1,10 @@
 # Changelog: @go/crypto
 
+## v1.5.3 (2026-06-21)
+- **重构与错误堆栈支持**:
+  - 重构 `js_export.go`，将 `Encrypt`、`Decrypt` 等匿名函数以及 `Generate*KeyPair` 类接口改写为具名函数，并动态使用 `jsmod.MakeError` 包裹返回的 error。
+  - 升级 `cast` 依赖至 v1.5.3，`encoding` 依赖至 v1.5.4，`jsmod` 依赖至 v1.5.3，`safe` 依赖至 v1.5.2，`rand` 依赖至 v1.5.3。
+
 ## v1.5.2 (2026-06-11)
 - **版本对齐**: 基础设施全局对齐 v1.5.2。
 
