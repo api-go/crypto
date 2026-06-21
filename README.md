@@ -49,8 +49,8 @@
 
 ### 哈希算法 (Hash)
 - `func MD5(data []byte) []byte`
-- `func Sha256(data []byte) []byte`
-- `func HmacSha256(data, key []byte) []byte`
+- `func SHA256(data []byte) []byte`
+- `func HMACSHA256(data, key []byte) []byte`
 
 ## 📦 安装
 

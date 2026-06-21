@@ -1,5 +1,8 @@
 # Changelog: @go/crypto
 
+## v1.5.4 (2026-06-21)
+- **命名规范**: SHA 缩写全大写，`Sha1`/`Sha256`/`Sha512` → `SHA1`/`SHA256`/`SHA512`，HMAC 系列同步修正为 `HMACSHA1`/`HMACSHA256`/`HMACSHA512`。
+
 ## v1.5.3 (2026-06-21)
 - **重构与错误堆栈支持**:
   - 重构 `js_export.go`，将 `Encrypt`、`Decrypt` 等匿名函数以及 `Generate*KeyPair` 类接口改写为具名函数，并动态使用 `jsmod.MakeError` 包裹返回的 error。

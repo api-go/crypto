@@ -19,17 +19,17 @@ func TestHashCompatibility(t *testing.T) {
 	
 	// SHA256
 	h2 := sha256.Sum256(data)
-	if !bytes.Equal(crypto.Sha256(data), h2[:]) { t.Error("Sha256 mismatch") }
+	if !bytes.Equal(crypto.SHA256(data), h2[:]) { t.Error("SHA256 mismatch") }
 	
 	// HMAC
 	key := []byte("key")
 	mac := hmac.New(sha256.New, key)
 	mac.Write(data)
-	if !bytes.Equal(crypto.HMACSha256(key, data), mac.Sum(nil)) { t.Error("HMACSha256 mismatch") }
+	if !bytes.Equal(crypto.HMACSHA256(key, data), mac.Sum(nil)) { t.Error("HMACSHA256 mismatch") }
 }
 
 func TestHashString(t *testing.T) {
 	s := []byte("hello")
 	if crypto.MD5ToHex(s) == "" { t.Error("MD5ToHex empty") }
-	if crypto.Sha256ToBase64(s) == "" { t.Error("Sha256ToBase64 empty") }
+	if crypto.SHA256ToBase64(s) == "" { t.Error("SHA256ToBase64 empty") }
 }
