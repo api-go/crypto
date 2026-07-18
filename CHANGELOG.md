@@ -1,5 +1,9 @@
 # Changelog: @go/crypto
 
+## v1.5.5 (2026-07-18)
+- **确定性密钥修复**: HKDF 首轮耗尽后使用带轮次域分离的新一轮字节流，避免 RSA 密钥生成触发 entropy limit，同时保留原有首轮输出。
+- **依赖校验修复**: 重新整理模块图并补齐 checksum。
+
 ## v1.5.4 (2026-06-21)
 - **命名规范**: SHA 缩写全大写，`Sha1`/`Sha256`/`Sha512` → `SHA1`/`SHA256`/`SHA512`，HMAC 系列同步修正为 `HMACSHA1`/`HMACSHA256`/`HMACSHA512`。
 
