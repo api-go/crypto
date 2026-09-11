@@ -23,6 +23,7 @@
 - `func (s *Symmetric) EncryptBytes(data []byte) ([]byte, error)`
 - `func (s *Symmetric) DecryptBytes(data []byte) ([]byte, error)`
 - `func (s *Symmetric) TryDecrypt(data []byte) []byte` (解密失败返回原始数据)
+- `func (s *Symmetric) DeriveKey(info []byte, size int) (*safe.SafeBuf, error)`（使用 HKDF-SHA256 从受保护主密钥派生用途隔离的子密钥）
 
 ### 非对称加密与签名 (Asymmetric)
 - `func NewRSA(safePrivateKeyBuf, safePublicKeyBuf *safe.SafeBuf) (*Asymmetric, error)`

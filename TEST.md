@@ -1,5 +1,8 @@
 # Test Report: @go/crypto
 
+## Unreleased 验证
+- `TestSymmetricDeriveKey` 验证相同用途稳定派生、不同用途域隔离、输出长度和非法长度拒绝。
+
 ## v1.5.6 验证
 - 全量测试与基准测试通过；密码派生非对称密钥回归连续运行 10 次通过。
 

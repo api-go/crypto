@@ -1,5 +1,8 @@
 # Changelog: @go/crypto
 
+## v1.5.8 (2026-09-12)
+- **对称密钥派生**: `Symmetric.DeriveKey` 使用 HKDF-SHA256 从受保护主密钥派生用途隔离的 `SafeBuf` 子密钥，不暴露原始 key/IV。
+
 ## v1.5.6 (2026-09-05)
 - **依赖对齐**: 升级全部 `apigo.cc/go/*` 依赖至当前已发布版本。
 

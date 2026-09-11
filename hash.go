@@ -44,8 +44,8 @@ func SHA1(data ...[]byte) []byte {
 	return h.Sum(nil)
 }
 
-func SHA1ToHex(data []byte) string { return encoding.Hex(SHA1(data)) }
-func SHA1ToBase64(data []byte) string { return encoding.Base64(SHA1(data)) }
+func SHA1ToHex(data []byte) string       { return encoding.Hex(SHA1(data)) }
+func SHA1ToBase64(data []byte) string    { return encoding.Base64(SHA1(data)) }
 func SHA1ToURLBase64(data []byte) string { return encoding.URLBase64(SHA1(data)) }
 
 // SHA256 系列
@@ -57,8 +57,8 @@ func SHA256(data ...[]byte) []byte {
 	return h.Sum(nil)
 }
 
-func SHA256ToHex(data []byte) string { return encoding.Hex(SHA256(data)) }
-func SHA256ToBase64(data []byte) string { return encoding.Base64(SHA256(data)) }
+func SHA256ToHex(data []byte) string       { return encoding.Hex(SHA256(data)) }
+func SHA256ToBase64(data []byte) string    { return encoding.Base64(SHA256(data)) }
 func SHA256ToURLBase64(data []byte) string { return encoding.URLBase64(SHA256(data)) }
 
 // SHA512 系列
@@ -70,8 +70,8 @@ func SHA512(data ...[]byte) []byte {
 	return h.Sum(nil)
 }
 
-func SHA512ToHex(data []byte) string { return encoding.Hex(SHA512(data)) }
-func SHA512ToBase64(data []byte) string { return encoding.Base64(SHA512(data)) }
+func SHA512ToHex(data []byte) string       { return encoding.Hex(SHA512(data)) }
+func SHA512ToBase64(data []byte) string    { return encoding.Base64(SHA512(data)) }
 func SHA512ToURLBase64(data []byte) string { return encoding.URLBase64(SHA512(data)) }
 
 // HMAC 系列

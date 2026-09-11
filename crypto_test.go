@@ -10,10 +10,10 @@ import (
 func TestSecurityErase(t *testing.T) {
 	key := []byte("1234567890123456")
 	iv := []byte("1234567890123456")
-	
+
 	// 测试 AndEraseKey 确实擦除了原始内存
 	lcrypto.NewAESCBCAndEraseKey(key, iv)
-	
+
 	if bytes.Equal(key, []byte("1234567890123456")) {
 		t.Fatal("Security Failure: Key was NOT erased")
 	}
@@ -32,7 +32,9 @@ func TestAESExhaustive(t *testing.T) {
 	// 1. 正常加解密
 	enc, _ := aes.EncryptBytes(data)
 	dec, _ := aes.DecryptBytes(enc)
-	if !bytes.Equal(data, dec) { t.Fatal("CBC roundtrip failed") }
+	if !bytes.Equal(data, dec) {
+		t.Fatal("CBC roundtrip failed")
+	}
 
 	// 2. 损坏密文测试 (应能正常处理 Pkcs5UnPadding 失败)
 	damaged := append([]byte(nil), enc...)
@@ -54,17 +56,21 @@ func TestAsymmetricExhaustive(t *testing.T) {
 	priv, pub, _ := lcrypto.GenerateRSAKeyPair(2048)
 	rsa, _ := lcrypto.NewRSAAndEraseKey(priv, pub)
 	data := []byte("rsa test data")
-	
+
 	enc, _ := rsa.EncryptBytes(data)
 	dec, _ := rsa.DecryptBytes(enc)
-	if !bytes.Equal(data, dec) { t.Fatal("RSA encryption failed") }
+	if !bytes.Equal(data, dec) {
+		t.Fatal("RSA encryption failed")
+	}
 
 	// ECDSA Hybrid (ECDH + AESGCM)
 	priv2, pub2, _ := lcrypto.GenerateECDSAKeyPair(256)
 	ecdsa, _ := lcrypto.NewECDSAAndEraseKey(priv2, pub2)
 	enc2, _ := ecdsa.EncryptBytes(data)
 	dec2, _ := ecdsa.DecryptBytes(enc2)
-	if !bytes.Equal(data, dec2) { t.Fatal("ECDSA Hybrid encryption failed") }
+	if !bytes.Equal(data, dec2) {
+		t.Fatal("ECDSA Hybrid encryption failed")
+	}
 }
 
 func TestAnsiX923Padding(t *testing.T) {
@@ -100,7 +106,9 @@ func TestConcurrentSafe(t *testing.T) {
 			done <- true
 		}()
 	}
-	for i := 0; i < 100; i++ { <-done }
+	for i := 0; i < 100; i++ {
+		<-done
+	}
 }
 
 // Benchmarks

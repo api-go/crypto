@@ -1,10 +1,13 @@
 package crypto
 
 import (
+	"crypto/sha256"
 	"errors"
+	"io"
 	"runtime"
 
 	"apigo.cc/go/safe"
+	"golang.org/x/crypto/hkdf"
 )
 
 // Symmetric 封装对称加密的生命周期与安全存储
@@ -57,6 +60,27 @@ func (s *Symmetric) Close() {
 	if s.iv != nil {
 		s.iv.Close()
 	}
+}
+
+// DeriveKey derives a domain-separated subkey from the protected symmetric key.
+// info is public context identifying the subkey's purpose and is not erased.
+func (s *Symmetric) DeriveKey(info []byte, size int) (*safe.SafeBuf, error) {
+	if s == nil || s.key == nil || s.iv == nil {
+		return nil, errors.New("symmetric key is unavailable")
+	}
+	if size <= 0 || size > 255*sha256.Size {
+		return nil, errors.New("derived key size must be between 1 and 8160 bytes")
+	}
+	key := s.key.Open()
+	defer key.Close()
+	salt := s.iv.Open()
+	defer salt.Close()
+	derived := make([]byte, size)
+	if _, err := io.ReadFull(hkdf.New(sha256.New, key.Data, salt.Data, info), derived); err != nil {
+		safe.ZeroMemory(derived)
+		return nil, err
+	}
+	return safe.NewSafeBufAndErase(derived), nil
 }
 
 // Encrypt 使用 SafeBuf 传入明文进行加密

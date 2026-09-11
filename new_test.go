@@ -55,7 +55,7 @@ func TestMustAndTryMethods(t *testing.T) {
 	if len(sig) == 0 {
 		t.Error("Sign with cast.As failed")
 	}
-	
+
 	valid, _ := a.Verify(data, sig)
 	if !valid {
 		t.Error("Verify failed")
