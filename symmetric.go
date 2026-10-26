@@ -119,9 +119,16 @@ func (s *Symmetric) Decrypt(data []byte) (*safe.SafeBuf, error) {
 func (s *Symmetric) DecryptBytes(data []byte) ([]byte, error) {
 	key := s.key.Open()
 	defer key.Close()
-	iv := s.iv.Open()
-	defer iv.Close()
-	return s.cipher.Decrypt(data, key.Data, iv.Data)
+	var legacyIV []byte
+	if s.iv != nil {
+		iv := s.iv.Open()
+		defer iv.Close()
+		legacyIV = iv.Data
+	}
+	if cipher, ok := s.cipher.(AutoIVCipher); ok {
+		return cipher.DecryptCompatible(data, key.Data, legacyIV)
+	}
+	return s.cipher.Decrypt(data, key.Data, legacyIV)
 }
 
 // TryDecrypt 解密失败时返回原始数据 (静默解密)
@@ -131,4 +138,32 @@ func (s *Symmetric) TryDecrypt(data []byte) []byte {
 		return data
 	}
 	return r
+}
+
+// EncryptAutoIV encrypts protected plaintext with a fresh embedded IV.
+// Prefer this to fixed-IV encryption for new data. Unsupported ciphers return
+// ErrNotImplemented; no fallback to fixed-IV encryption is performed.
+func (s *Symmetric) EncryptAutoIV(data *safe.SafeBuf) ([]byte, error) {
+	plain := data.Open()
+	defer plain.Close()
+	return s.EncryptBytesAutoIV(plain.Data)
+}
+
+// EncryptBytesAutoIV encrypts with a fresh embedded IV, without modifying the
+// configured legacy IV. It is safe for concurrent calls without Close.
+func (s *Symmetric) EncryptBytesAutoIV(data []byte) ([]byte, error) {
+	cipher, ok := s.cipher.(AutoIVCipher)
+	if !ok {
+		return nil, ErrNotImplemented
+	}
+	key := s.key.Open()
+	defer key.Close()
+	return cipher.EncryptAutoIV(data, key.Data)
+}
+
+// EncryptAndEraseAutoIV encrypts with a fresh embedded IV and erases plaintext,
+// including on failure.
+func (s *Symmetric) EncryptAndEraseAutoIV(data []byte) ([]byte, error) {
+	defer safe.ZeroMemory(data)
+	return s.EncryptBytesAutoIV(data)
 }

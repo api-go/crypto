@@ -1,5 +1,10 @@
 # Changelog: @go/crypto
 
+## v1.5.9（2026-10-26）
+- 新增公共层 AutoIV 加密接口与 AES-GCM 标准随机 nonce 封装；统一解密先认证新格式再兼容旧 IV，无自定义格式头。
+- 保留原加密与底层显式 IV 契约；短 GCM IV 返回错误。JS 新增 EncryptAutoIV。
+- 对齐 cast v1.5.8、jsmod v1.5.5，补充兼容、篡改、并发和性能验证及推荐用法。
+
 ## v1.5.8 (2026-09-12)
 - **对称密钥派生**: `Symmetric.DeriveKey` 使用 HKDF-SHA256 从受保护主密钥派生用途隔离的 `SafeBuf` 子密钥，不暴露原始 key/IV。
 

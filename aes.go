@@ -61,6 +61,9 @@ func (c *AESCipher) Encrypt(data []byte, key []byte, iv []byte) ([]byte, error) 
 		if err != nil {
 			return nil, err
 		}
+		if len(iv) < aesgcm.NonceSize() {
+			return nil, errors.New("GCM IV must contain at least 12 bytes")
+		}
 		return aesgcm.Seal(nil, iv[:aesgcm.NonceSize()], data, nil), nil
 	}
 	blockSize := block.BlockSize()
@@ -81,6 +84,9 @@ func (c *AESCipher) Decrypt(data []byte, key []byte, iv []byte) ([]byte, error) 
 		if err != nil {
 			return nil, err
 		}
+		if len(iv) < aesgcm.NonceSize() {
+			return nil, errors.New("GCM IV must contain at least 12 bytes")
+		}
 		return aesgcm.Open(nil, iv[:aesgcm.NonceSize()], data, nil)
 	}
 	blockMode := cipher.NewCBCDecrypter(block, iv[:block.BlockSize()])
@@ -90,4 +96,47 @@ func (c *AESCipher) Decrypt(data []byte, key []byte, iv []byte) ([]byte, error) 
 	origData := make([]byte, len(data))
 	blockMode.CryptBlocks(origData, data)
 	return Pkcs5UnPadding(origData), nil
+}
+
+// EncryptAutoIV returns nonce || ciphertext || tag (12-byte nonce, 16-byte tag).
+// A key must not encrypt more than 2^32 messages using random nonces.
+func (c *AESCipher) EncryptAutoIV(data, key []byte) ([]byte, error) {
+	if !c.useGCM {
+		return nil, ErrNotImplemented
+	}
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	gcm, err := cipher.NewGCMWithRandomNonce(block)
+	if err != nil {
+		return nil, err
+	}
+	return gcm.Seal(nil, nil, data, nil), nil
+}
+
+// DecryptCompatible authenticates the embedded-nonce format first, then legacy
+// ciphertext using legacyIV. Explicit Decrypt retains its original wire contract.
+func (c *AESCipher) DecryptCompatible(data, key, legacyIV []byte) ([]byte, error) {
+	if !c.useGCM {
+		return c.Decrypt(data, key, legacyIV)
+	}
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+	if len(data) >= gcm.NonceSize()+gcm.Overhead() {
+		plain, openErr := gcm.Open(nil, data[:gcm.NonceSize()], data[gcm.NonceSize():], nil)
+		if openErr == nil {
+			return plain, nil
+		}
+	}
+	if len(legacyIV) >= gcm.NonceSize() {
+		return gcm.Open(nil, legacyIV[:gcm.NonceSize()], data, nil)
+	}
+	return nil, errors.New("GCM authentication failed")
 }

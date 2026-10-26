@@ -3,9 +3,9 @@ module apigo.cc/go/crypto
 go 1.25.0
 
 require (
-	apigo.cc/go/cast v1.5.7
+	apigo.cc/go/cast v1.5.8
 	apigo.cc/go/encoding v1.5.8
-	apigo.cc/go/jsmod v1.5.4
+	apigo.cc/go/jsmod v1.5.5
 	apigo.cc/go/safe v1.5.4
 	golang.org/x/crypto v0.52.0
 )

@@ -25,6 +25,32 @@
 - `func (s *Symmetric) TryDecrypt(data []byte) []byte` (解密失败返回原始数据)
 - `func (s *Symmetric) DeriveKey(info []byte, size int) (*safe.SafeBuf, error)`（使用 HKDF-SHA256 从受保护主密钥派生用途隔离的子密钥）
 
+### 推荐：AES-GCM 自动 IV
+
+新数据优先使用 `EncryptBytesAutoIV`，不要在同一密钥下重复使用固定 IV。
+
+```go
+s, err := crypto.NewAESGCMWithoutEraseKey(key, legacyIV) // 仅新格式可传 nil IV
+if err != nil { return err }
+defer s.Close()
+encrypted, err := s.EncryptBytesAutoIV(plaintext)
+// 接收端使用相同 key；读取旧数据仍需配置原 IV。
+plaintext, err = s.DecryptBytes(encrypted)
+```
+
+- `EncryptAutoIV(data *safe.SafeBuf) ([]byte, error)`
+- `EncryptBytesAutoIV(data []byte) ([]byte, error)`
+- `EncryptAndEraseAutoIV(data []byte) ([]byte, error)`：成功或失败均擦除明文。
+- 输出固定为 `[12 字节随机 IV][密文正文][16 字节认证 tag]`，无格式头、无填充；总长为明文长度 + 28。可与标准 GCM 跨语言互操作。
+- 同一 key 的随机 IV 加密总量不得超过 2^32 条；多实例/多进程累计计数，提前轮换 key。历史固定 IV 重复使用的风险不能由新格式修复，迁移建议换 key。
+- 原 `Encrypt` / `EncryptBytes` / `EncryptAndErase` 继续使用配置 IV，保留旧输出格式。仅用于兼容或调用方保证 IV 唯一的协议。
+- `Decrypt` / `DecryptBytes` 先认证内嵌 IV 格式，失败后使用配置 IV 认证旧格式；至少 28 字节的旧密文最多处理两次，均失败返回错误。`TryDecrypt` 保留失败返回原数据的旧契约，不能用来判断认证成功。
+- 底层 `AESGCM.Encrypt/Decrypt(data, key, iv)` 保持显式 IV 格式，不进行自动识别。短 GCM IV 返回错误；旧的超长 IV 仍取前 12 字节。
+- 公共层通过可选 `AutoIVCipher` 接口调度，不修改 `SymmetricCipher`；首批支持 AES-GCM。CBC 自动 IV 返回 `ErrNotImplemented`，不静默降级；其他自定义算法需实现该可选能力。
+- JavaScript：新增 `EncryptAutoIV(data, key)`，现有 `Decrypt(data, key, iv)` 同样兼容两种格式（仅新格式时 IV 可传空）。
+- 自动 IV 不修改实例 IV，`DeriveKey` 的派生结果不变；并发操作可用，但不要与 `Close` 并发。
+- 先升级接收端 crypto，再开启发送端自动 IV；旧版本无法读取新格式。CBC/SM4、ECDSA/X25519 混合封装不变。
+
 ### 非对称加密与签名 (Asymmetric)
 - `func NewRSA(safePrivateKeyBuf, safePublicKeyBuf *safe.SafeBuf) (*Asymmetric, error)`
 - `func NewRSAByPassword(password, salt []byte, bitSize ...int) (*Asymmetric, error)` (Argon2id 确定性生成)
@@ -68,6 +94,6 @@ import (
 )
 
 // 使用 cast.As 替代原有的 MustEncrypt 系列
-cipher, _ := crypto.NewAESCBCAndEraseKey(key, iv)
-ciphertext := cast.As(cipher.EncryptBytes(plaintext))
+cipher, _ := crypto.NewAESGCMAndEraseKey(key, iv)
+ciphertext := cast.As(cipher.EncryptBytesAutoIV(plaintext))
 ```

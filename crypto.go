@@ -12,6 +12,14 @@ type SymmetricCipher interface {
 	Decrypt(data []byte, key []byte, iv []byte) ([]byte, error)
 }
 
+// AutoIVCipher is an optional authenticated cipher capability. Implementations
+// return ErrNotImplemented for modes that cannot safely identify both formats.
+// DecryptCompatible must authenticate either the embedded IV format or legacy data.
+type AutoIVCipher interface {
+	EncryptAutoIV(data, key []byte) ([]byte, error)
+	DecryptCompatible(data, key, legacyIV []byte) ([]byte, error)
+}
+
 // AsymmetricAlgorithm 非对称算法基础接口 (签名/验签)
 type AsymmetricAlgorithm interface {
 	ParsePrivateKey(der []byte) (any, error)

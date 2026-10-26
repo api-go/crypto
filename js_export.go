@@ -34,8 +34,9 @@ func init() {
 		"MakeToken": MakeToken,
 
 		// AES GCM (Stateless)
-		"Encrypt": jsEncrypt,
-		"Decrypt": jsDecrypt,
+		"Encrypt":       jsEncrypt,
+		"EncryptAutoIV": jsEncryptAutoIV,
+		"Decrypt":       jsDecrypt,
 
 		// AES CBC (Stateless)
 		"EncryptCBC": jsEncryptCBC,
@@ -61,6 +62,7 @@ func jsEncrypt(data, key, iv []byte) ([]byte, error) {
 	if err != nil {
 		return nil, jsmod.MakeError(err)
 	}
+	defer s.Close()
 	res, err := s.EncryptBytes(data)
 	if err != nil {
 		return nil, jsmod.MakeError(err)
@@ -73,6 +75,7 @@ func jsDecrypt(data, key, iv []byte) ([]byte, error) {
 	if err != nil {
 		return nil, jsmod.MakeError(err)
 	}
+	defer s.Close()
 	res, err := s.DecryptBytes(data)
 	if err != nil {
 		return nil, jsmod.MakeError(err)
@@ -85,6 +88,7 @@ func jsEncryptCBC(data, key, iv []byte) ([]byte, error) {
 	if err != nil {
 		return nil, jsmod.MakeError(err)
 	}
+	defer s.Close()
 	res, err := s.EncryptBytes(data)
 	if err != nil {
 		return nil, jsmod.MakeError(err)
@@ -97,6 +101,7 @@ func jsDecryptCBC(data, key, iv []byte) ([]byte, error) {
 	if err != nil {
 		return nil, jsmod.MakeError(err)
 	}
+	defer s.Close()
 	res, err := s.DecryptBytes(data)
 	if err != nil {
 		return nil, jsmod.MakeError(err)
@@ -182,4 +187,17 @@ func jsGenerateX25519KeyPair() ([]byte, []byte, error) {
 		return nil, nil, jsmod.MakeError(err)
 	}
 	return priv, pub, nil
+}
+
+func jsEncryptAutoIV(data, key []byte) ([]byte, error) {
+	s, err := NewAESGCMAndEraseKey(key, nil)
+	if err != nil {
+		return nil, jsmod.MakeError(err)
+	}
+	defer s.Close()
+	result, err := s.EncryptBytesAutoIV(data)
+	if err != nil {
+		return nil, jsmod.MakeError(err)
+	}
+	return result, nil
 }
