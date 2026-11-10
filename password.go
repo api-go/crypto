@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"io"
 
-	"apigo.cc/go/safe"
+	"github.com/api-go/safe"
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/hkdf"
 )

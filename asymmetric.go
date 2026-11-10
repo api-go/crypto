@@ -4,7 +4,7 @@ import (
 	"crypto"
 	"runtime"
 
-	"apigo.cc/go/safe"
+	"github.com/api-go/safe"
 )
 
 // Asymmetric 封装非对称加密的生命周期与安全存储

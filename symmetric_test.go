@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"apigo.cc/go/crypto"
+	"github.com/api-go/crypto"
 )
 
 func TestSymmetricObfuscation(t *testing.T) {

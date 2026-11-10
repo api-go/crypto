@@ -7,7 +7,7 @@ import (
 	"crypto/sha256"
 	"testing"
 
-	"apigo.cc/go/crypto"
+	"github.com/api-go/crypto"
 )
 
 func TestHashCompatibility(t *testing.T) {

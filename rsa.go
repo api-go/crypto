@@ -8,7 +8,7 @@ import (
 	"crypto/x509"
 	"errors"
 
-	"apigo.cc/go/safe"
+	"github.com/api-go/safe"
 )
 
 type RSAAlgorithm struct {

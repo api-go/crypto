@@ -5,7 +5,7 @@ import (
 	"crypto/cipher"
 	"errors"
 
-	"apigo.cc/go/safe"
+	"github.com/api-go/safe"
 )
 
 type AESCipher struct{ useGCM bool }

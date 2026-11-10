@@ -82,15 +82,15 @@ plaintext, err = s.DecryptBytes(encrypted)
 ## 📦 安装
 
 ```bash
-go get apigo.cc/go/crypto
+go get github.com/api-go/crypto
 ```
 
 ## 💡 示例 (配合 cast.As 消除摩擦)
 
 ```go
 import (
-    "apigo.cc/go/crypto"
-    "apigo.cc/go/cast"
+    "github.com/api-go/crypto"
+    "github.com/api-go/cast"
 )
 
 // 使用 cast.As 替代原有的 MustEncrypt 系列

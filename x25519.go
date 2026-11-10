@@ -6,7 +6,7 @@ import (
 	"errors"
 	"io"
 
-	"apigo.cc/go/safe"
+	"github.com/api-go/safe"
 	"golang.org/x/crypto/curve25519"
 	"golang.org/x/crypto/hkdf"
 )

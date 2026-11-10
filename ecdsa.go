@@ -10,7 +10,7 @@ import (
 	"io"
 	"math/big"
 
-	"apigo.cc/go/safe"
+	"github.com/api-go/safe"
 	"golang.org/x/crypto/hkdf"
 )
 

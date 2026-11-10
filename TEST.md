@@ -52,3 +52,13 @@ Go 1.26.4 / darwin arm64 / Apple M3 Max，GOWORK=off，使用已发布依赖，�
 | `RSA_Sign` | **1407588 ns/op** | 符合 RSA 标准耗时。 |
 | `Ed25519_Sign` | **28299 ns/op** | 高性能签名。 |
 | `X25519_Encrypt` | **204639 ns/op** | 混合加密模式性能表现。 |
+
+## GitHub migration validation (pending release)
+
+Module paths and internal dependency versions are migrated. Development verification uses GOWORK=off and explicit sibling replacements; remove these replacements before release. See migration validation logs for actual results. Existing unrelated working changes are preserved and require separate review.
+
+API inventory verification: `GOWORK=off go doc` succeeded; output retained in the migration validation directory. Source exports were preserved by the path migration.
+
+## GitHub release verification
+
+GOWORK=off go test -v ./... and go test -bench=. ./... passed using published GitHub dependencies, without local replacements. go mod verify passed.

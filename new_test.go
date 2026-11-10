@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"testing"
 
-	"apigo.cc/go/cast"
-	"apigo.cc/go/crypto"
+	"github.com/api-go/cast"
+	"github.com/api-go/crypto"
 )
 
 func TestMustAndTryMethods(t *testing.T) {

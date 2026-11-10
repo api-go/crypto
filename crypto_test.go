@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	lcrypto "apigo.cc/go/crypto"
+	lcrypto "github.com/api-go/crypto"
 )
 
 func TestSecurityErase(t *testing.T) {

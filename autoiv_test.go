@@ -9,8 +9,8 @@ import (
 	"sync"
 	"testing"
 
-	crypto "apigo.cc/go/crypto"
-	"apigo.cc/go/safe"
+	crypto "github.com/api-go/crypto"
+	"github.com/api-go/safe"
 )
 
 func TestAutoIVCompatibility(t *testing.T) {

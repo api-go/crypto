@@ -6,7 +6,7 @@ import (
 	"io"
 	"runtime"
 
-	"apigo.cc/go/safe"
+	"github.com/api-go/safe"
 	"golang.org/x/crypto/hkdf"
 )
 

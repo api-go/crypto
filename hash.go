@@ -8,7 +8,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 
-	"apigo.cc/go/encoding"
+	"github.com/api-go/encoding"
 )
 
 // MD5 返回数据的原始 MD5 字节

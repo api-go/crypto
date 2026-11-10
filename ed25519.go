@@ -6,7 +6,7 @@ import (
 	"crypto/rand"
 	"errors"
 
-	"apigo.cc/go/safe"
+	"github.com/api-go/safe"
 )
 
 type Ed25519Algorithm struct{}

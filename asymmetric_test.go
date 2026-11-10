@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"apigo.cc/go/crypto"
+	"github.com/api-go/crypto"
 )
 
 func TestRSA_AllModes(t *testing.T) {
