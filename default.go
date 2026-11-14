@@ -1,7 +1,10 @@
 package crypto
 
 import (
+	"errors"
 	"sync"
+
+	"github.com/api-go/safe"
 )
 
 var (
@@ -24,8 +27,8 @@ func init() {
 }
 
 // OnSetDefaultAES 注册配置解密 AES 实例变更的回调。
-// 即使在 SetDefaultAES 调用之后，此方法仍然有效，直到调用 LockDefaultAES。
-// 注册时会立即以当前实例（硬编码或已注入的生产密钥）调用一次回调。
+// 必须在 SetDefaultAES 或 SetDefaultAESFromSafeBuf 成功安装前注册。
+// 注册时立即以当前实例调用一次，安装后会收到新实例；安装成功后禁止新增注册。
 func OnSetDefaultAES(h func(*Symmetric)) {
 	defaultAESLock.Lock()
 	defer defaultAESLock.Unlock()
@@ -66,4 +69,37 @@ func SetDefaultAES(key, iv []byte) {
 		// 彻底清理并释放引用
 		defaultAESHandlers = nil
 	})
+}
+
+// SetDefaultAESFromSafeBuf installs default AES without an unprotected input API.
+// Success transfers ownership of key and iv to the default AES: callers must not
+// close or modify them afterward. On error the caller retains both objects.
+// Registers the same one-shot observer lock as SetDefaultAES. Do not call from an observer.
+func SetDefaultAESFromSafeBuf(key, iv *safe.SafeBuf) error {
+	if key == nil || iv == nil || key == iv {
+		return errors.New("crypto: distinct key and IV buffers required")
+	}
+	plainKey, plainIV := key.Open(), iv.Open()
+	keySize, ivSize := len(plainKey.Data), len(plainIV.Data)
+	plainKey.Close()
+	plainIV.Close()
+	if (keySize != 16 && keySize != 24 && keySize != 32) || ivSize < 12 || ivSize > 16 {
+		return errors.New("crypto: invalid default AES key or IV length")
+	}
+	installed := false
+	defaultAESOnce.Do(func() {
+		defaultAESLock.Lock()
+		defer defaultAESLock.Unlock()
+		defaultAES, _ = NewAESGCM(key, iv)
+		isLocked = true
+		installed = true
+		for _, handler := range defaultAESHandlers {
+			handler(defaultAES)
+		}
+		defaultAESHandlers = nil
+	})
+	if !installed {
+		return errors.New("crypto: default AES already set")
+	}
+	return nil
 }

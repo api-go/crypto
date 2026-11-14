@@ -97,3 +97,13 @@ import (
 cipher, _ := crypto.NewAESGCMAndEraseKey(key, iv)
 ciphertext := cast.As(cipher.EncryptBytesAutoIV(plaintext))
 ```
+
+## SafeBuf 默认 AES 注入（v1.5.11）
+
+`SetDefaultAESFromSafeBuf(key, iv *safe.SafeBuf) error` 接受独立的 SafeBuf；key 长度为 16/24/32，IV 长度为 12–16。成功后默认 AES 接管两个对象，调用方不得再 Close 或修改；失败时调用方负责 Close。与 SetDefaultAES 共用一次设置限制，设置成功后锁定观察者注册。观察者须在包变量初始化期间注册，不得在回调内重新设置。新入口对重复设置返回错误，旧入口保留原行为。
+
+该入口避免导出模板接触明文，但长度校验及实际运算仍在库内部短暂打开秘密，不保证进程内攻击防御。现有 SetDefaultAES 的切片输入及擦除契约不变。自包含 Go 导出需配合 safe v1.5.6、keys v1.5.13。
+
+Development verification now replaces the complete pending dependency graph, not only safe/crypto. All absolute-path replacements are temporary and must be removed in dependency order before release.
+
+Release v1.5.11: verified with published dependencies and GOWORK=off; all temporary replacements have been removed. Earlier development-validation notes describe historical local checks.

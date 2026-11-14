@@ -1,3 +1,20 @@
+## v1.5.11 SafeBuf 注入验证
+
+环境：2026-11-14，Go 1.26.4，darwin/arm64，Apple M3 Max。
+
+验证命令：`GOWORK=off go test -v ./...`、`GOWORK=off go test -bench=. ./...`，均通过。`ai/tools/getExports` 不存在，使用 `GOWORK=off go doc` 与导出源码交叉核对新增 API。性能为本机单次测量，非 SLA。
+
+开发依赖：safe v1.5.6 显式 replace 到 `/Users/star/Case2/go/safe`（本轮v1.5.6）；其余依赖按已发布索引。发布前移除替换并改用正式 safe 版本。
+
+覆盖：隔离子进程验证 SetDefaultAESFromSafeBuf，成功转移所有权并经 GC 后使用、无效/同对象输入拒绝、错误保留输入、第二次安装拒绝、旧 setter 不能覆盖、观察者注册锁定，以及原有默认 AES / 对称算法测试；定向 race `-run TestDefaultAESFromSafeBuf` 通过。
+
+| 基准 | ns/op |
+| --- | ---: |
+| AES_GCM | 2339 |
+| GCMCompatible/64/EncryptAutoIV | 1506 |
+
+API：SetDefaultAESFromSafeBuf 已对照源码和 go doc 核对；README 中英文说明新入口及成功/失败所有权。
+
 # Test Report: @go/crypto
 
 ## v1.5.9 发布验证（2026-10-26）
@@ -62,3 +79,25 @@ API inventory verification: `GOWORK=off go doc` succeeded; output retained in th
 ## GitHub release verification
 
 GOWORK=off go test -v ./... and go test -bench=. ./... passed using published GitHub dependencies, without local replacements. go mod verify passed.
+
+## 最终依赖图验证（2026-11-14，未发布）
+
+显式本地 replace 覆盖本轮待发布依赖链；GOWORK=off go mod tidy、go test -v ./...、go test -bench=. -benchtime=1x ./...。基准按固定 1 次采样，避免排除计时的昂贵准备阶段反复校准。本轮结果：[('tidy', '0'), ('test', '0'), ('bench', '0')]。0 为通过，其他结果待定位。
+
+固定一次采样的基准摘要（非稳定性能测量）：
+
+```text
+BenchmarkGCMCompatible/64/ExplicitLegacy-16         	       1	      4750 ns/op	  13.47 MB/s	    1344 B/op	       3 allocs/op
+BenchmarkGCMCompatible/64/SymmetricLegacy-16        	       1	      6416 ns/op	   9.98 MB/s	    1440 B/op	       7 allocs/op
+BenchmarkGCMCompatible/64/CompatibleLegacy-16       	       1	      6792 ns/op	   9.42 MB/s	    1504 B/op	       8 allocs/op
+```
+
+## v1.5.11 正式发布验证（2026-11-14）
+
+GOWORK=off；移除全部 replace，使用已发布依赖。go mod tidy、go test -v ./...、go test -bench=. ./...、go mod verify 均通过。API 工具不可用，使用 go doc 与源码核对。
+
+```text
+BenchmarkGCMCompatible/64/ExplicitLegacy-16         	 3401901	       334.8 ns/op	 191.18 MB/s	    1344 B/op	       3 allocs/op
+BenchmarkGCMCompatible/64/SymmetricLegacy-16        	  591081	      2013 ns/op	  31.79 MB/s	    1440 B/op	       7 allocs/op
+BenchmarkGCMCompatible/64/CompatibleLegacy-16       	  564176	      2118 ns/op	  30.22 MB/s	    1504 B/op	       8 allocs/op
+```

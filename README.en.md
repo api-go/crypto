@@ -33,3 +33,13 @@ Do not call Close concurrently with encryption/decryption.
 JavaScript adds EncryptAutoIV(data, key); existing Decrypt(data, key, iv) accepts
 both formats. Upgrade receivers before enabling new writers. Old versions cannot
 read the new format.
+
+## Default AES from SafeBuf (v1.5.11)
+
+`SetDefaultAESFromSafeBuf(key, iv *safe.SafeBuf) error` requires distinct buffers, a 16/24/32-byte key and a 12–16-byte IV. Success transfers both buffers to default AES; callers must neither close nor modify them. On error, callers retain ownership and must close them. The setter shares the one-shot installation and observer lock with SetDefaultAES. Register observers during package variable initialization; never set default AES from an observer. Repeated installation returns an error; the legacy setter retains its behavior.
+
+Generated code need not open plaintext; library validation and encryption still briefly use plaintext internally. This does not protect against process inspection. The legacy slice setter and erasure contract remain unchanged. Self-contained Go exports require pending safe v1.5.6 and keys v1.5.13.
+
+Development verification now replaces the complete pending dependency graph, not only safe/crypto. All absolute-path replacements are temporary and must be removed in dependency order before release.
+
+Release v1.5.11: verified with published dependencies and GOWORK=off; all temporary replacements have been removed. Earlier development-validation notes describe historical local checks.
